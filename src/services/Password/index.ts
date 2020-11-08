@@ -1,0 +1,1 @@
+export { Bcrypt as Password } from "./Bcrypt";
