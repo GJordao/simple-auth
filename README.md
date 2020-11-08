@@ -29,6 +29,89 @@ $ npm run start:prod
 
 TO BE IMPLEMENTED
 
+# Configuration
+
+Simple-Auth aims to be highly configurable and this configuration comes in the form of environment variables.
+Below you will find a list of all the available variables, their description and types.
+
+## DATABASE_TYPE *
+      
+- **Required**: true
+- **Type**: string
+- **Values**: postgres, mysql
+- **Description**: The type of database to connect to. At the moment only postgres is supported, mysql/mariadb are untested but should be supported. We are aiming to increase the number of databases supported
+
+## DATABASE_HOST *
+
+- **Required**: true
+- **Type**: string
+- **Description**: The host name of your database, this could be the name of the service inside a docker network or a url
+
+## DATABASE_NAME *
+      
+- **Required**: true
+- **Type**: string
+- **Description**: The name of the database to connect to. It is up to you to unsure that the database is created before initialising the service
+
+## DATABASE_PORT *
+      
+- **Required**: true
+- **Type**: number
+- **Description**: The port in which the database service is listening
+
+## DATABASE_USERNAME *
+      
+- **Required**: true
+- **Type**: string
+- **Description**: The user of the database to use in the connection
+
+## DATABASE_PASSWORD *
+      
+- **Required**: true
+- **Type**: string
+- **Description**: The password of the user to use in the connection
+      
+## TOKEN_ENCRYPTION_KEY *
+      
+- **Required**: true
+- **Type**: string
+- **Description**: The secret key to encrypt the tokens with. We are currently using [node-jsonwebtoken](https://github.com/auth0/node-jsonwebtoken#usage) you can find more information there.
+
+## PASSWORD_PEPPER
+      
+- **Required**: false
+- **Type**: string
+- **Description**: A string to be used as [pepper](https://en.wikipedia.org/wiki/Pepper_(cryptography)) in protecting user passwords. **If you set this you can not change it a later time as it would make it impossible to unhash previous passwords**
+- **Default Value**: ""
+      
+## PORT
+      
+- **Required**: false
+- **Type**: number
+- **Description**: The port in which the HTTP server will run
+- **Default Value**: 5000
+
+## ACCESS_TOKEN_EXPIRE_TIME
+      
+- **Required**: false
+- **Type**: number
+- **Description**: The number of seconds a token should last. This should be a short time, 10 to 60 minutes usually
+- **Default Value**: 600 (10 minutes)
+
+## REFRESH_TOKEN_EXPIRE_TIME
+      
+- **Required**: false
+- **Type**: number
+- **Description**: The number of seconds the refresh token should last. This token is long lived, usually between serveral days or months. When this token expires your user will have to login again.
+- **Default Value**: 2629743 (~30 days)
+
+## MODE
+      
+- **Required**: false
+- **Type**: string
+- **Description**: The mode the service should run in. Possible values include ["dev", "prod"]. dev mode will show more debug information.
+- **Default Value**: prod
+
 # Development
 
 ## Installation
