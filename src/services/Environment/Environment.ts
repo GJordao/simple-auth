@@ -31,7 +31,7 @@ export class Environment {
     }
 
     private defaultIfNotEmpty(field, defaultValue) {
-        if(field !== "" && field !== null && field !== undefined && !isNaN(field)) {
+        if(field !== "" && field !== null && field !== undefined) {
             return field;
         }
 
@@ -47,8 +47,9 @@ export class Environment {
     }
 
     private number(field): number {
-        if(typeof field !== "number") {
-            return parseInt(field);
+        const parsedField = parseInt(field);
+        if(!isNaN(parsedField)) {
+            return parsedField;
         }
 
         return field;
