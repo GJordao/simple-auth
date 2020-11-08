@@ -31,7 +31,7 @@ export class Environment {
     }
 
     private defaultIfNotEmpty(field, defaultValue) {
-        if(field !== "" && field !== null && field !== undefined) {
+        if(field !== "" && field !== null && field !== undefined && !isNaN(field)) {
             return field;
         }
 
