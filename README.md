@@ -27,7 +27,41 @@ $ npm run start:prod
 ```
 ## Running with Docker
 
-TO BE IMPLEMENTED
+Ideally we want to have an image in Docker hub, but since we're still developing for now you need to pull the repo and build the image locally.
+
+So firstly pull the repo and open a terminal window on that location.
+
+Then run
+
+```bash
+docker build -t simple-auth .
+```
+
+Once the image is built you can run the service with the minum config like so:
+
+```bash
+docker run -p 5000:5000 -e DATABASE_HOST=<YOUR-HOST> -e DATABASE_NAME=<YOUR-DB-NAME> -e DATABASE_PASSWORD=<YOUR-DB-USER-PASSWORD> -e DATABASE_PORT=<YOUR-DATABASE-PORT> -e DATABASE_TYPE=postgres -e DATABASE_USERNAME=<YOUR-DB-USER> -e TOKEN_ENCRYPTION_KEY=<YOUR-ENCRYPTION-KEY> simple-auth:latest
+```
+
+Or if you're using docker-compose add the service to your docker-compose.yml
+
+```yml
+  auth:
+    image: simple-auth:latest
+    container_name: api
+    ports:
+      - "5000:5000"
+    environment:
+      DATABASE_HOST: <YOUR-HOST>
+      DATABASE_NAME: <YOUR-DB-NAME>
+      DATABASE_USERNAME: <YOUR-DB-USER>
+      DATABASE_PASSWORD: <YOUR-DB-USER-PASSWORD>
+      DATABASE_PORT: <YOUR-DATABASE-PORT>
+      DATABASE_TYPE: postgres
+      TOKEN_ENCRYPTION_KEY: <YOUR-ENCRYPTION-KEY>
+```
+
+These are the minimum configurations to run the service. After it is up you should be able to access the available endpoints by accessing `localhost:5000`
 
 # Configuration
 
