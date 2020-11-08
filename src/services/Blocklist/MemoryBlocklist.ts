@@ -14,7 +14,7 @@ export class MemoryBlocklist implements IBlocklist {
         private envService: Environment,
     ) {
         this.blocklist = [];
-        setInterval(this.removeOldTokensFromList, this.envService.ACCESS_TOKEN_EXPIRE_TIME * 1000);
+        setInterval(() => this.removeOldTokensFromList(), this.envService.ACCESS_TOKEN_EXPIRE_TIME * 1000);
     }
 
     add(value: string): void {
