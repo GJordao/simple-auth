@@ -136,15 +136,58 @@ Below you will find a list of all the available variables, their description and
       
 - **Required**: false
 - **Type**: number
-- **Description**: The number of seconds the refresh token should last. This token is long lived, usually between serveral days or months. When this token expires your user will have to login again.
+- **Description**: The number of seconds the refresh token should last. This token is long lived, usually between serveral days or months. When this token expires your user will have to login again
 - **Default Value**: 2629743 (~30 days)
 
 ## MODE
       
 - **Required**: false
 - **Type**: string
-- **Description**: The mode the service should run in. Possible values include ["dev", "prod"]. dev mode will show more debug information.
+- **Description**: The mode the service should run in. Possible values include ["dev", "prod"]. dev mode will show more debug information
 - **Default Value**: prod
+
+## SMTP_HOST
+      
+- **Required**: false
+- **Type**: string
+- **Description**: The server host of the SMTP email client to use. If none is provided the auth service will not send confirmation emails
+
+## SMTP_PORT
+      
+- **Required**: false (true if using [SMTP_HOST](#SMTP_HOST))
+- **Type**: number
+- **Description**: The server port where the SMTP server is running
+
+## SMTP_SECURE
+      
+- **Required**: false
+- **Type**: boolean
+- **Description**: Wether to use TLS in the connection to the server
+- **Default Value**: false
+
+## SMTP_USER
+      
+- **Required**: false (true if using [SMTP_HOST](#SMTP_HOST))
+- **Type**: string
+- **Description**: The user to connect to the SMTP server
+
+## SMTP_PASSWORD
+      
+- **Required**: false (true if using [SMTP_HOST](#SMTP_HOST))
+- **Type**: string
+- **Description**: The password of the user to connect to the SMTP server
+
+## SMTP_MAIL_FROM
+      
+- **Required**: false (true if using [SMTP_HOST](#SMTP_HOST))
+- **Type**: string
+- **Description**: The email address that will show up in "From" when sending emails
+
+## AUTH_URL
+
+- **Required**: false (true if using [SMTP_HOST](#SMTP_HOST))
+- **Type**: string
+- **Description**: The URL of where the simple-auth service is located. If you're hiding the service behind a proxy you need to provide the URL of direct access. This is used for the simple-auth service to provide email links for account confirmation, account deletion and password reset. Bear in mind that password resets are not possible without an email service
 
 # Development
 

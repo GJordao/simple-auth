@@ -10,6 +10,7 @@ import { ValidatorController } from "./controllers/ValidatorController";
 import { Blocklist } from "./services/Blocklist";
 import { Environment } from "./services/Environment";
 import { Logger } from "./services/Logger";
+import { Mail } from "./services/Mail";
 import { Password } from "./services/Password";
 import { Token } from "./services/Token";
 // Entities
@@ -46,6 +47,7 @@ import {User} from "./entities/User";
         Blocklist,
         Environment,
         Logger,
+        Mail,
         Password,
         Token,
     ],

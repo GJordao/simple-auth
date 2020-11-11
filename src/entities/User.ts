@@ -17,6 +17,11 @@ export class User {
     @Column()
     accountActive: boolean;
 
+    @Column({
+        default: ""
+    })
+    activationId?: string;
+
     @CreateDateColumn()
     addedDate: Date;
 }

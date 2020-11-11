@@ -24,6 +24,11 @@ const invalidCredentialsError = new HttpException({
     error: "Invalid credentials",
 }, HttpStatus.BAD_REQUEST);
 
+const inactiveAccountError = new HttpException({
+    status: HttpStatus.BAD_REQUEST,
+    error: "Account is not active",
+}, HttpStatus.BAD_REQUEST);
+
 @Controller()
 export class LoginController {
     constructor(
@@ -55,6 +60,10 @@ export class LoginController {
 
         if (!doesPasswordMatch) {
             throw invalidCredentialsError;
+        }
+
+        if(!user.accountActive) {
+            throw inactiveAccountError;
         }
 
         const accessToken = this.tokenService.sign(

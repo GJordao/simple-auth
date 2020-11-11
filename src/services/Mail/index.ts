@@ -1,0 +1,1 @@
+export { Nodemailer as Mail } from "./Nodemailer";
