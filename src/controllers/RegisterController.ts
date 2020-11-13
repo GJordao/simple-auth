@@ -6,11 +6,14 @@ import {
     HttpException, 
     HttpStatus,
     Post,
+    Redirect,
+    Req,
     Query,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Request } from "express";
 import { v4 as uuidv4 } from "uuid";
+import { Repository } from 'typeorm';
 // Services
 import { Environment } from "../services/Environment";
 import { Password } from '../services/Password';
@@ -60,7 +63,7 @@ export class RegisterController {
             newUser.activationId = uuidv4();
             await this.usersRepository.save(newUser);
 
-            const redirectUrl = `${this.envService.AUTH_URL}/auth/register?activationId=${newUser.activationId}`;
+            const redirectUrl = `${this.envService.AUTH_URL}/auth/register/activation?activationId=${newUser.activationId}`;
 
             this.mailService.send(
                 newUser.email,
@@ -80,11 +83,11 @@ export class RegisterController {
      * @param activationId the activation ID send by mail
      */
     @Get("/auth/register/activation")
+    @Redirect()
     async confirm(
-        @Query("activationId")
-            activationId: string
+        @Req() request: Request,
+            @Query("activationId") activationId: string
     ): Promise<any> {
-        // TODO: Get redirect email from env var, this makes more sense
         const user = await this.usersRepository.findOne({ activationId: activationId });
         if(!user) {
             throw new HttpException({
@@ -102,6 +105,16 @@ export class RegisterController {
 
         user.accountActive = true;
         await this.usersRepository.update({id: user.id}, user);
+
+        let redirectUrl = this.envService.ACCOUNT_CONFIRMATION_REDIRECT_URL;
+        if(redirectUrl.length === 0) {
+            redirectUrl = `${request.protocol}://${request.headers.host}`;
+        }
+
+        return {
+            url: redirectUrl,
+            statusCode: 303
+        };
     }
 
     /**

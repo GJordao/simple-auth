@@ -11,6 +11,8 @@ You can run the service in two ways:
 - Pull the git repo and run the service locally
 - (Prefered) Pull the docker image and run along with your other services
 
+In both cases you will need a database engine running somewhere
+
 ## Running locally
 
 Pull the git repo and in a terminal window run the following commands:
@@ -188,6 +190,20 @@ Below you will find a list of all the available variables, their description and
 - **Required**: false (true if using [SMTP_HOST](#SMTP_HOST))
 - **Type**: string
 - **Description**: The URL of where the simple-auth service is located. If you're hiding the service behind a proxy you need to provide the URL of direct access. This is used for the simple-auth service to provide email links for account confirmation, account deletion and password reset. Bear in mind that password resets are not possible without an email service
+
+## ACCOUNT_CONFIRMATION_REDIRECT_URL
+
+- **Required**: false
+- **Type**: string
+- **Description**: A URL to redirect the user to after confirming account creation. This works only when using an SMTP server and the user confirms the account through the email sent.
+- **Default Value**: The host of the application we got through the request
+
+## DB_SESSIONS
+
+- **Required**: false
+- **Type**: boolean
+- **Description**: If you set this to true user sessions will be saved to the database and compared each time. This will be safer as the service will be able to track which sessions are active, but it will be slower as it requires reading and writing to the database.
+- **Default Value**: false
 
 # Development
 

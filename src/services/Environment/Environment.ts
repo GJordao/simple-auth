@@ -21,6 +21,8 @@ export class Environment {
     public SMTP_PASSWORD: string;
     public SMTP_MAIL_FROM: string;
     public AUTH_URL: string;
+    public ACCOUNT_CONFIRMATION_REDIRECT_URL: string;
+    public DB_SESSIONS: boolean;
 
     constructor() {
         this.DATABASE_TYPE = this.required(process.env.DATABASE_TYPE);
@@ -42,6 +44,8 @@ export class Environment {
         this.SMTP_PASSWORD = this.defaultIfNotEmpty(process.env.SMTP_PASSWORD, "");
         this.SMTP_MAIL_FROM = this.defaultIfNotEmpty(process.env.SMTP_MAIL_FROM, "");
         this.AUTH_URL = this.defaultIfNotEmpty(process.env.AUTH_URL, "");
+        this.ACCOUNT_CONFIRMATION_REDIRECT_URL = this.defaultIfNotEmpty(process.env.ACCOUNT_CONFIRMATION_REDIRECT_URL, "");
+        this.DB_SESSIONS = this.boolean(process.env.DB_SESSIONS);
     }
 
     private defaultIfNotEmpty(field, defaultValue) {

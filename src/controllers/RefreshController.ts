@@ -8,8 +8,13 @@ import {
     Post,
     UseGuards,
 } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 // Configs
 import {AuthGuard} from "../configs/AuthGuard";
+// Entities
+import { DbSession } from "../entities/DbSession";
+import { User } from "./../entities/User";
 // Services
 import { Blocklist } from "./../services/Blocklist";
 import { Environment } from "../services/Environment";
@@ -31,6 +36,10 @@ export class RefreshController {
         private readonly envService: Environment,
         private readonly logger: Logger,
         private readonly tokenService: Token,
+        @InjectRepository(DbSession)
+        private dbSessionRepository: Repository<DbSession>,
+        @InjectRepository(User)
+        private userRepository: Repository<User>
     ) {
     }
 
@@ -50,6 +59,16 @@ export class RefreshController {
                 this.envService.TOKEN_ENCRYPTION_KEY,
                 { ignoreExpiration: true }
             );
+
+            if(this.envService.DB_SESSIONS) {
+                const exists = this.dbSessionRepository.find({
+                    token: token
+                });
+
+                if(!exists) {
+                    throw invalidTokenError;
+                }
+            }
 
             // This will throw an exception if the token is expired
             const decodedRefreshToken = this.tokenService.verify(
@@ -85,6 +104,21 @@ export class RefreshController {
             );
 
             this.blocklistService.add(token);
+            if(this.envService.DB_SESSIONS) {
+                await this.dbSessionRepository.delete({
+                    token:token
+                });
+
+                const user = await this.userRepository.findOne({
+                    id: decodedAccessToken.id
+                });
+
+                const dbSession = new DbSession();
+                dbSession.token = newAccessToken;
+                dbSession.user = user;
+
+                await this.dbSessionRepository.save(dbSession);
+            }
 
             const response = new OutgoingTokens();
             response.bearer = { token: newAccessToken };

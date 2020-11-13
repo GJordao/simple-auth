@@ -14,7 +14,8 @@ import { Mail } from "./services/Mail";
 import { Password } from "./services/Password";
 import { Token } from "./services/Token";
 // Entities
-import {User} from "./entities/User";
+import { DbSession } from "./entities/DbSession";
+import { User } from "./entities/User";
 
 @Module({
     imports: [
@@ -30,11 +31,11 @@ import {User} from "./entities/User";
             username: process.env.DATABASE_USERNAME,
             password: process.env.DATABASE_PASSWORD,
             database: process.env.DATABASE_NAME,
-            entities: [User],
+            entities: [DbSession, User],
             entityPrefix: "simple_auth_",
             synchronize: true,
         }),
-        TypeOrmModule.forFeature([User])
+        TypeOrmModule.forFeature([DbSession, User])
     ],
     controllers: [
         LoginController,

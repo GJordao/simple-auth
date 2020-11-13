@@ -14,6 +14,7 @@ import { Logger } from "../services/Logger";
 import { Password } from '../services/Password';
 import { Token } from "../services/Token";
 // Entities
+import { DbSession } from "../entities/DbSession";
 import { User } from "../entities/User";
 // DTOs
 import { IncomingCrendetials } from "./DTOs/IncomingCredentials";
@@ -37,7 +38,9 @@ export class LoginController {
         private readonly passwordService: Password,
         private readonly tokenService: Token,
         @InjectRepository(User)
-        private usersRepository: Repository<User>
+        private usersRepository: Repository<User>,
+        @InjectRepository(DbSession)
+        private dbSessionRepository: Repository<DbSession>
     ) {
     }
 
@@ -46,7 +49,6 @@ export class LoginController {
         @Body()
             credentials: IncomingCrendetials
     ): Promise<OutgoingTokens> {
-        // TODO: Store token in DB if env flag is active perhaps
         const PASSWORD_PEPPER = this.envService.PASSWORD_PEPPER;
         const user = await this.usersRepository.findOne({ email: credentials.email });
         if (!user) {
@@ -85,6 +87,13 @@ export class LoginController {
         const response = new OutgoingTokens();
         response.bearer = { token: accessToken };
         response.refresh = {token: refreshToken };
+
+        if(this.envService.DB_SESSIONS) {
+            const dbSession = new DbSession();
+            dbSession.token = accessToken;
+            dbSession.user = user;
+            await this.dbSessionRepository.save(dbSession);
+        }
 
         return response;
     }

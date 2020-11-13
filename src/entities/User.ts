@@ -1,4 +1,13 @@
-import {Entity, PrimaryGeneratedColumn, Column, CreateDateColumn} from "typeorm";
+// Packages
+import {
+    Column, 
+    CreateDateColumn, 
+    Entity, 
+    OneToMany,
+    PrimaryGeneratedColumn, 
+} from "typeorm";
+// Entities
+import { DbSession } from "./DbSession";
 
 @Entity()
 export class User {
@@ -24,4 +33,7 @@ export class User {
 
     @CreateDateColumn()
     addedDate: Date;
+
+    @OneToMany(() => DbSession, dbSession => dbSession.user)
+    dbSessions: DbSession[];
 }
