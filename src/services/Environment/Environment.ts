@@ -23,6 +23,7 @@ export class Environment {
     public AUTH_URL: string;
     public ACCOUNT_CONFIRMATION_REDIRECT_URL: string;
     public DB_SESSIONS: boolean;
+    public PASSWORD_RESET_URL: string;
 
     constructor() {
         this.DATABASE_TYPE = this.required(process.env.DATABASE_TYPE);
@@ -46,6 +47,7 @@ export class Environment {
         this.AUTH_URL = this.defaultIfNotEmpty(process.env.AUTH_URL, "");
         this.ACCOUNT_CONFIRMATION_REDIRECT_URL = this.defaultIfNotEmpty(process.env.ACCOUNT_CONFIRMATION_REDIRECT_URL, "");
         this.DB_SESSIONS = this.boolean(process.env.DB_SESSIONS);
+        this.PASSWORD_RESET_URL = this.required(process.env.PASSWORD_RESET_URL);
     }
 
     private defaultIfNotEmpty(field, defaultValue) {

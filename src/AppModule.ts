@@ -4,6 +4,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { LoginController } from './controllers/LoginController';
 import { LogoutController } from './controllers/LogoutController';
 import { RefreshController } from './controllers/RefreshController';
+import { PasswordController } from "./controllers/PasswordController";
 import { RegisterController } from './controllers/RegisterController';
 import { ValidatorController } from "./controllers/ValidatorController";
 // Services
@@ -40,6 +41,7 @@ import { User } from "./entities/User";
     controllers: [
         LoginController,
         LogoutController,
+        PasswordController,
         RefreshController,
         RegisterController,
         ValidatorController

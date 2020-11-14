@@ -31,6 +31,11 @@ export class User {
     })
     activationId?: string;
 
+    @Column({
+        default: ""
+    })
+    passwordResetId?: string;
+
     @CreateDateColumn()
     addedDate: Date;
 

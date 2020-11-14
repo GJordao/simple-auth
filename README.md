@@ -113,6 +113,11 @@ Below you will find a list of all the available variables, their description and
 - **Type**: string
 - **Description**: The secret key to encrypt the tokens with. We are currently using [node-jsonwebtoken](https://github.com/auth0/node-jsonwebtoken#usage) you can find more information there.
 
+## PASSWORD_RESET_URL *
+- **Required**: true
+- **Type**: string
+- **Description**: A URL to your app's page for a password reset. This page will be used when a user requests requests a password reset (usually forgotten password). When a user forgets their password, an email will be sent to the user's email with the link to this page and an additional query property which you will then need to pass to the API for the reset. Ex: if you pass `http://mywebsite.co/password-reset` the request will reach your page like so: `http://mywebsite.co/password-reset?passwordResetId=<some-uuid>`, you will then need to pass that UUID to the correct endpoint to trigger the password reset for the user. The idea here is that you will have control of the workflow and the design of the page for password reset without gimmiks from our service.
+
 ## PASSWORD_PEPPER
       
 - **Required**: false
