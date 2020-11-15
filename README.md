@@ -65,6 +65,8 @@ Or if you're using docker-compose add the service to your docker-compose.yml
 
 These are the minimum configurations to run the service. After it is up you should be able to access the available endpoints by accessing `localhost:5000`
 
+You can access the Open API documentation at: `http://localhost:5000/auth/explorer`
+
 # Configuration
 
 Simple-Auth aims to be highly configurable and this configuration comes in the form of environment variables.

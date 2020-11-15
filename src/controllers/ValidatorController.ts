@@ -9,6 +9,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { ApiBearerAuth, ApiResponse } from '@nestjs/swagger';
 // Configs
 import {AuthGuard} from "../configs/AuthGuard";
 // Entities
@@ -17,10 +18,12 @@ import { DbSession } from "../entities/DbSession";
 import { Blocklist } from "./../services/Blocklist";
 import { Environment } from "../services/Environment";
 import { Token } from "../services/Token";
+// DTOs
+import { OutgoingErrorMessage } from "./DTOs/OutgoingErrorMessage";
 
 const invalidTokenError = new HttpException({
-    status: HttpStatus.BAD_REQUEST,
-    error: "Invalid token",
+    statusCode: HttpStatus.BAD_REQUEST,
+    message: "Invalid token",
 }, HttpStatus.BAD_REQUEST);
 
 @Controller()
@@ -36,6 +39,10 @@ export class ValidatorController {
 
     @Get("/auth/isValid")
     @UseGuards(AuthGuard)
+    @ApiBearerAuth()
+    @ApiResponse({ status: 200, description: 'Successful'})
+    @ApiResponse({ status: 400, description: 'Invalid credentials sent through', type: OutgoingErrorMessage})
+    @ApiResponse({ status: 500, description: 'Server error', type: OutgoingErrorMessage})
     async validate(
         @Headers() headers
     ): Promise<any> {

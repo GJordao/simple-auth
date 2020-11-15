@@ -13,6 +13,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { v4 as uuidv4 } from "uuid";
+import { ApiBearerAuth, ApiResponse } from '@nestjs/swagger';
 // Configs
 import {AuthGuard} from "../configs/AuthGuard";
 // Entities
@@ -29,15 +30,16 @@ import { Token } from "../services/Token";
 import { IncomingEmail }  from "./DTOs/IncomingEmail";
 import { IncomingPasswordChange }  from "./DTOs/IncomingPasswordChange";
 import { IncomingPasswordReset }  from "./DTOs/IncomingPasswordReset";
+import { OutgoingErrorMessage } from "./DTOs/OutgoingErrorMessage";
 
 const invalidTokenError = new HttpException({
-    status: HttpStatus.BAD_REQUEST,
-    error: "Invalid tokens sent through",
+    statusCode: HttpStatus.BAD_REQUEST,
+    message: "Invalid tokens sent through",
 }, HttpStatus.BAD_REQUEST);
 
 const invalidCredentialsError = new HttpException({
-    status: HttpStatus.BAD_REQUEST,
-    error: "Wrong credentials sent through",
+    statusCode: HttpStatus.BAD_REQUEST,
+    message: "Wrong credentials sent through",
 }, HttpStatus.BAD_REQUEST);
 
 @Controller()
@@ -58,6 +60,10 @@ export class PasswordController {
 
     @Put("/auth/password")
     @UseGuards(AuthGuard)
+    @ApiBearerAuth()
+    @ApiResponse({ status: 200, description: 'Successful'})
+    @ApiResponse({ status: 400, description: 'Invalid credentials sent through', type: OutgoingErrorMessage})
+    @ApiResponse({ status: 500, description: 'Server error', type: OutgoingErrorMessage})
     async changePassword(
         @Headers() headers,
             @Body()
@@ -88,6 +94,10 @@ export class PasswordController {
     }
 
     @Get("/auth/password/reset")
+    @ApiResponse({ status: 200, description: 'Successful'})
+    @ApiResponse({ status: 400, description: 'Invalid credentials sent through', type: OutgoingErrorMessage})
+    @ApiResponse({ status: 500, description: 'Server error', type: OutgoingErrorMessage})
+    @ApiResponse({ status: 501, description: 'E-mail service not active, it is required for this endpoint to work', type: OutgoingErrorMessage})
     async requestPasswordReset(
         @Query()
             query: IncomingEmail
@@ -95,8 +105,8 @@ export class PasswordController {
         const isMailServiceActive = await this.mailService.isActive();
         if(!isMailServiceActive) {
             throw new HttpException({
-                status: HttpStatus.NOT_IMPLEMENTED,
-                error: "E-mail service not active",
+                statusCode: HttpStatus.NOT_IMPLEMENTED,
+                message: "E-mail service not active",
             }, HttpStatus.NOT_IMPLEMENTED);
         }
 
@@ -104,8 +114,8 @@ export class PasswordController {
 
         if (!user) {
             throw new HttpException({
-                status: HttpStatus.BAD_REQUEST,
-                error: "Invalid e-mail address",
+                statusCode: HttpStatus.BAD_REQUEST,
+                message: "Invalid e-mail address",
             }, HttpStatus.BAD_REQUEST);
         }
     
@@ -122,6 +132,9 @@ export class PasswordController {
     }
 
     @Put("/auth/password/reset")
+    @ApiResponse({ status: 200, description: 'Successful'})
+    @ApiResponse({ status: 400, description: 'Invalid credentials sent through', type: OutgoingErrorMessage})
+    @ApiResponse({ status: 500, description: 'Server error', type: OutgoingErrorMessage})
     async resetPassword(
         @Body()
             body: IncomingPasswordReset
@@ -132,8 +145,8 @@ export class PasswordController {
 
         if (!user) {
             throw new HttpException({
-                status: HttpStatus.BAD_REQUEST,
-                error: "Invalid reset ID",
+                statusCode: HttpStatus.BAD_REQUEST,
+                message: "Invalid reset ID",
             }, HttpStatus.BAD_REQUEST);
         }
 

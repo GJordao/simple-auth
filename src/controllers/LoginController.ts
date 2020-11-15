@@ -8,6 +8,9 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { 
+    ApiResponse
+} from '@nestjs/swagger';
 // Services
 import { Environment } from "../services/Environment";
 import { Logger } from "../services/Logger";
@@ -18,16 +21,17 @@ import { DbSession } from "../entities/DbSession";
 import { User } from "../entities/User";
 // DTOs
 import { IncomingCrendetials } from "./DTOs/IncomingCredentials";
+import { OutgoingErrorMessage } from "./DTOs/OutgoingErrorMessage";
 import { OutgoingTokens } from "./DTOs/OutgoingTokens";
 
 const invalidCredentialsError = new HttpException({
-    status: HttpStatus.BAD_REQUEST,
-    error: "Invalid credentials",
+    statusCode: HttpStatus.BAD_REQUEST,
+    message: "Invalid credentials",
 }, HttpStatus.BAD_REQUEST);
 
 const inactiveAccountError = new HttpException({
-    status: HttpStatus.BAD_REQUEST,
-    error: "Account is not active",
+    statusCode: HttpStatus.BAD_REQUEST,
+    message: "Account is not active",
 }, HttpStatus.BAD_REQUEST);
 
 @Controller()
@@ -45,6 +49,9 @@ export class LoginController {
     }
 
     @Post("/auth/login")
+    @ApiResponse({ status: 200, description: 'Authentication successful', type: OutgoingTokens})
+    @ApiResponse({ status: 400, description: 'Invalid credentials sent through', type: OutgoingErrorMessage})
+    @ApiResponse({ status: 500, description: 'Server error', type: OutgoingErrorMessage})
     async login(
         @Body()
             credentials: IncomingCrendetials

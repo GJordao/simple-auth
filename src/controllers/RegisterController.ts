@@ -14,6 +14,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Request } from "express";
 import { v4 as uuidv4 } from "uuid";
 import { Repository } from 'typeorm';
+import { plainToClass } from 'class-transformer';
+import { ApiResponse } from '@nestjs/swagger';
 // Services
 import { Environment } from "../services/Environment";
 import { Password } from '../services/Password';
@@ -22,8 +24,8 @@ import { Mail } from "./../services/Mail";
 import { User } from "../entities/User";
 // DTOs
 import { IncomingCrendetials } from "./DTOs/IncomingCredentials";
+import { OutgoingErrorMessage } from "./DTOs/OutgoingErrorMessage";
 import { OutgoingUser } from "./DTOs/OutgoingUser";
-import { plainToClass } from 'class-transformer';
 
 @Controller()
 export class RegisterController {
@@ -37,6 +39,9 @@ export class RegisterController {
     }
 
     @Post("/auth/register")
+    @ApiResponse({ status: 200, description: 'Successful', type: OutgoingUser})
+    @ApiResponse({ status: 400, description: 'E-mail already registered', type: OutgoingErrorMessage})
+    @ApiResponse({ status: 500, description: 'Server error', type: OutgoingErrorMessage})
     async register(
         @Body()
             credentials: IncomingCrendetials
@@ -45,8 +50,8 @@ export class RegisterController {
 
         if (user) {
             throw new HttpException({
-                status: HttpStatus.BAD_REQUEST,
-                error: "E-mail already registered",
+                statusCode: HttpStatus.BAD_REQUEST,
+                message: "E-mail already registered",
             }, HttpStatus.BAD_REQUEST);
         }
     
@@ -84,6 +89,9 @@ export class RegisterController {
      */
     @Get("/auth/register/activation")
     @Redirect()
+    @ApiResponse({ status: 303, description: 'Successful redirect for configured URL'})
+    @ApiResponse({ status: 400, description: 'Invalid credentials sent through', type: OutgoingErrorMessage})
+    @ApiResponse({ status: 500, description: 'Server error', type: OutgoingErrorMessage})
     async confirm(
         @Req() request: Request,
             @Query("activationId") activationId: string
@@ -91,15 +99,15 @@ export class RegisterController {
         const user = await this.usersRepository.findOne({ activationId: activationId });
         if(!user) {
             throw new HttpException({
-                status: HttpStatus.BAD_REQUEST,
-                error: "No account found for activation token",
+                statusCode: HttpStatus.BAD_REQUEST,
+                message: "No account found for activation token",
             }, HttpStatus.BAD_REQUEST);
         }
 
         if(user.accountActive) {
             throw new HttpException({
-                status: HttpStatus.BAD_REQUEST,
-                error: "Account already active",
+                statusCode: HttpStatus.BAD_REQUEST,
+                message: "Account already active",
             }, HttpStatus.BAD_REQUEST);
         }
 
@@ -122,6 +130,10 @@ export class RegisterController {
      * @param email the user email
      */
     @Get("/auth/register/confirmation")
+    @ApiResponse({ status: 200, description: 'Successful'})
+    @ApiResponse({ status: 400, description: 'Either the token is invalid or the account is already active', type: OutgoingErrorMessage})
+    @ApiResponse({ status: 500, description: 'Server error', type: OutgoingErrorMessage})
+    @ApiResponse({ status: 501, description: 'E-mail service not active, it is required for this endpoint to work', type: OutgoingErrorMessage})
     async getConfirmationEmail(
         @Query("email")
             email: string
@@ -129,23 +141,23 @@ export class RegisterController {
         const isMailServiceActive = await this.mailService.isActive();
         if(!isMailServiceActive) {
             throw new HttpException({
-                status: HttpStatus.SERVICE_UNAVAILABLE,
-                error: "E-mail serice is not available",
+                statusCode: HttpStatus.SERVICE_UNAVAILABLE,
+                message: "E-mail serice is not available",
             }, HttpStatus.SERVICE_UNAVAILABLE);
         }
 
         const user = await this.usersRepository.findOne({ email: email });
         if(!user) {
             throw new HttpException({
-                status: HttpStatus.BAD_REQUEST,
-                error: "No account found for activation token",
+                statusCode: HttpStatus.BAD_REQUEST,
+                message: "No account found for activation token",
             }, HttpStatus.BAD_REQUEST);
         }
 
         if(user.accountActive) {
             throw new HttpException({
-                status: HttpStatus.BAD_REQUEST,
-                error: "Account already active",
+                statusCode: HttpStatus.BAD_REQUEST,
+                message: "Account already active",
             }, HttpStatus.BAD_REQUEST);
         }
 

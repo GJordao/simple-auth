@@ -10,6 +10,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { ApiBearerAuth, ApiResponse } from '@nestjs/swagger';
 // Configs
 import {AuthGuard} from "../configs/AuthGuard";
 // Entities
@@ -22,11 +23,12 @@ import { Logger } from "./../services/Logger";
 import { Token } from "../services/Token";
 // DTOs
 import { IncomingRefreshToken }  from "./DTOs/IncomingRefreshToken";
+import { OutgoingErrorMessage } from "./DTOs/OutgoingErrorMessage";
 import { OutgoingTokens } from "./DTOs/OutgoingTokens";
 
 const invalidTokenError = new HttpException({
-    status: HttpStatus.BAD_REQUEST,
-    error: "Invalid tokens sent through",
+    statusCode: HttpStatus.BAD_REQUEST,
+    message: "Invalid tokens sent through",
 }, HttpStatus.BAD_REQUEST);
 
 @Controller()
@@ -45,6 +47,10 @@ export class RefreshController {
 
     @Post("/auth/refresh")
     @UseGuards(AuthGuard)
+    @ApiBearerAuth()
+    @ApiResponse({ status: 200, description: 'Successful', type: OutgoingTokens})
+    @ApiResponse({ status: 400, description: 'Invalid credentials sent through', type: OutgoingErrorMessage})
+    @ApiResponse({ status: 500, description: 'Server error', type: OutgoingErrorMessage})
     async refresh(
         @Headers() headers,
             @Body()

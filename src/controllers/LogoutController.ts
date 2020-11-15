@@ -10,6 +10,10 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { 
+    ApiBearerAuth,
+    ApiResponse
+} from '@nestjs/swagger';
 // Configs
 import {AuthGuard} from "../configs/AuthGuard";
 // Entities
@@ -19,11 +23,12 @@ import { Blocklist } from "./../services/Blocklist";
 import { Environment } from "../services/Environment";
 import { Token } from "../services/Token";
 // DTOs
+import { OutgoingErrorMessage } from "./DTOs/OutgoingErrorMessage";
 import { IncomingRefreshToken }  from "./DTOs/IncomingRefreshToken";
 
 const invalidTokenError = new HttpException({
-    status: HttpStatus.BAD_REQUEST,
-    error: "Invalid tokens sent through",
+    statusCode: HttpStatus.BAD_REQUEST,
+    message: "Invalid tokens sent through",
 }, HttpStatus.BAD_REQUEST);
 
 @Controller()
@@ -39,6 +44,10 @@ export class LogoutController {
 
     @Post("/auth/logout")
     @UseGuards(AuthGuard)
+    @ApiBearerAuth()
+    @ApiResponse({ status: 200, description: 'Successful'})
+    @ApiResponse({ status: 400, description: 'Invalid credentials sent through', type: OutgoingErrorMessage})
+    @ApiResponse({ status: 500, description: 'Server error', type: OutgoingErrorMessage})
     async logout(
         @Headers() headers,
             @Body()
