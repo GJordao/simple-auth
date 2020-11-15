@@ -50,7 +50,6 @@ Or if you're using docker-compose add the service to your docker-compose.yml
 ```yml
   auth:
     image: simple-auth:latest
-    container_name: api
     ports:
       - "5000:5000"
     environment:
