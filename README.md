@@ -123,7 +123,7 @@ Below you will find a list of all the available variables, their description and
       
 - **Required**: false
 - **Type**: string
-- **Description**: A string to be used as [pepper](https://en.wikipedia.org/wiki/Pepper_(cryptography)) in protecting user passwords. **If you set this you can not change it a later time as it would make it impossible to unhash previous passwords**
+- **Description**: A string to be used as [pepper](https://en.wikipedia.org/wiki/Pepper_(cryptography)) in protecting user passwords. **If you set this you can not change it a later time as it would make it impossible to verify previously hashed passwords**
 - **Default Value**: ""
       
 ## PORT
