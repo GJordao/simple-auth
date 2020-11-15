@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 // Controllers
+import { AccountController } from './controllers/AccountController';
 import { LoginController } from './controllers/LoginController';
 import { LogoutController } from './controllers/LogoutController';
 import { RefreshController } from './controllers/RefreshController';
@@ -39,6 +40,7 @@ import { User } from "./entities/User";
         TypeOrmModule.forFeature([DbSession, User])
     ],
     controllers: [
+        AccountController,
         LoginController,
         LogoutController,
         PasswordController,
