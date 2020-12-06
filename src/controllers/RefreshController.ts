@@ -46,7 +46,6 @@ export class RefreshController {
     }
 
     @Post("/auth/refresh")
-    @UseGuards(AuthGuard)
     @ApiBearerAuth()
     @ApiResponse({ status: 200, description: 'Successful', type: OutgoingTokens})
     @ApiResponse({ status: 400, description: 'Invalid credentials sent through', type: OutgoingErrorMessage})
@@ -58,7 +57,6 @@ export class RefreshController {
     ): Promise<OutgoingTokens> {
         const token = headers.authorization.substr(7, headers.authorization.length - 7);
         const refreshToken = body.refreshToken;
-
         try {
             const decodedAccessToken = this.tokenService.verify(
                 token,

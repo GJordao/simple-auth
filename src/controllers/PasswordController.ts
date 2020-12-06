@@ -3,11 +3,11 @@ import {
     Body,
     Controller,
     Get,
-    Headers,
     HttpException,
     HttpStatus,
     Put,
     Query,
+    Req,
     UseGuards,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -65,14 +65,12 @@ export class PasswordController {
     @ApiResponse({ status: 400, description: 'Invalid credentials sent through', type: OutgoingErrorMessage})
     @ApiResponse({ status: 500, description: 'Server error', type: OutgoingErrorMessage})
     async changePassword(
-        @Headers() headers,
-            @Body()
-            body: IncomingPasswordChange
+        @Body() body: IncomingPasswordChange,
+            @Req() request: any
     ): Promise<void> {
-        const token = headers.authorization.substr(7, headers.authorization.length - 7);
-        const decodedToken = this.validateAndDecodeToken(token);
+        const tokenUser = request.user;
 
-        const user = await this.usersRepository.findOne({ email: decodedToken.email });
+        const user = await this.usersRepository.findOne({ email: tokenUser.email });
         if (!user) {
             throw invalidTokenError;
         }
@@ -158,30 +156,4 @@ export class PasswordController {
         await this.usersRepository.save(user);
 
     }
-
-    private validateAndDecodeToken(token: string): any{
-        let decodedToken = {};
-        try {
-            decodedToken = this.tokenService.verify(token, this.envService.TOKEN_ENCRYPTION_KEY);            
-        } catch (error) {
-            throw invalidTokenError;
-        }
-
-        if(this.envService.DB_SESSIONS) {
-            const exists = this.dbSessionRepository.find({
-                token: token
-            });
-
-            if(!exists) {
-                throw invalidTokenError;
-            }
-        }
-
-        const isTokenInBlocklist = this.blocklistService.exists(token);
-        if(isTokenInBlocklist) {
-            throw invalidTokenError;
-        }
-
-        return decodedToken;
-    } 
 }

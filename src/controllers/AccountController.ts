@@ -2,9 +2,9 @@
 import { 
     Controller,
     Delete,
-    Headers,
     HttpException,
     HttpStatus,
+    Req,
     UseGuards,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -51,11 +51,8 @@ export class AccountController {
     @ApiResponse({ status: 200, description: 'The account was deleted'})
     @ApiResponse({ status: 400, description: 'Invalid tokens sent through', type: OutgoingErrorMessage})
     @ApiResponse({ status: 500, description: 'Server error', type: OutgoingErrorMessage})
-    async refresh(
-        @Headers() headers
-    ): Promise<any> {
-        const token = headers.authorization.substr(7, headers.authorization.length - 7);
-        const decodedAccessToken = this.validateAndDecodeToken(token);
+    async refresh(@Req() request: any): Promise<any> {
+        const decodedAccessToken = request.user;
 
         const user = await this.userRepository.findOne({
             id: decodedAccessToken.id
@@ -71,32 +68,4 @@ export class AccountController {
 
         await this.userRepository.delete(user);
     }
-
-    // TODO: This seems to be useful in more than one place, place it somewhere accessible
-    private validateAndDecodeToken(token: string): any{
-        let decodedToken = {};
-        try {
-            decodedToken = this.tokenService.verify(token, this.envService.TOKEN_ENCRYPTION_KEY);            
-        } catch (error) {
-            this.blocklistService.add(token);
-            throw invalidTokenError;
-        }
-
-        if(this.envService.DB_SESSIONS) {
-            const exists = this.dbSessionRepository.find({
-                token: token
-            });
-
-            if(!exists) {
-                throw invalidTokenError;
-            }
-        }
-
-        const isTokenInBlocklist = this.blocklistService.exists(token);
-        if(isTokenInBlocklist) {
-            throw invalidTokenError;
-        }
-
-        return decodedToken;
-    } 
 }
