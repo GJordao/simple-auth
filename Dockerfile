@@ -1,4 +1,4 @@
-FROM node:12.19.0-alpine3.10
+FROM node:12.21-alpine3.12
 
 # Create app directory
 WORKDIR /usr/simpleauth
