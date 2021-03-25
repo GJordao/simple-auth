@@ -20,7 +20,7 @@ jobs:
           npm install
           npm run build
       - uses: actions/upload-artifact@master
-        width:
+        with:
           name: nest artifacts
           path: dist/
 
