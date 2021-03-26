@@ -10,7 +10,7 @@ COPY . .
 RUN rm -rf node_modules
 
 # Install dependencies
-RUN npm install
+RUN npm ci
 
 # Build application
 RUN npm run build

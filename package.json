@@ -1,10 +1,9 @@
 {
-  "name": "test-porject",
+  "name": "simple-auth",
   "version": "0.0.1",
-  "description": "",
-  "author": "",
-  "private": true,
-  "license": "UNLICENSED",
+  "description": "Simple,highly configurable and secure self-hosted authentication service",
+  "author": "Gustavo Jordão",
+  "license": "MIT",
   "scripts": {
     "prebuild": "rimraf dist",
     "build": "nest build",
