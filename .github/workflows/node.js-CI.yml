@@ -15,9 +15,9 @@ jobs:
     
     steps:
       - uses: actions/checkout@v2
-      - name: npm install and nest build  
+      - name: npm ci and nest build  
         run: |
-          npm install
+          npm ci
           npm run build
       - uses: actions/upload-artifact@master
         with:
@@ -32,7 +32,7 @@ jobs:
     strategy:
       matrix:
         node-version: [10.x, 12.x, 14.x, 15.x]
-        os: [ubuntu-latest, windows-latest, macos-latest]
+        os: [ubuntu-latest]
 
     steps:
     - uses: actions/checkout@v2
@@ -44,7 +44,7 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
-    - name: npm install and test
+    - name: npm ci and test
       run: |
-        npm install
+        npm ci
         npm test
