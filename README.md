@@ -60,6 +60,7 @@ Or if you're using docker-compose add the service to your docker-compose.yml
       DATABASE_PORT: <YOUR-DATABASE-PORT>
       DATABASE_TYPE: postgres
       TOKEN_ENCRYPTION_KEY: <YOUR-ENCRYPTION-KEY>
+      PASSWORD_RESET_URL: <YOUR-PASSWORD-RESET-URL>
 ```
 
 These are the minimum configurations to run the service. After it is up you should be able to access the available endpoints by accessing `localhost:5000`
