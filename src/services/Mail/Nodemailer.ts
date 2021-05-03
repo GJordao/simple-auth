@@ -3,28 +3,27 @@ import { Inject, Injectable, forwardRef } from '@nestjs/common';
 import {Transporter} from "nodemailer";
 import * as nodemailer from "nodemailer";
 // Services
-import { Environment } from "./../Environment";
 import { Logger } from "./../Logger";
 // Utils
 import { IMail } from "./IMail";
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class Nodemailer implements IMail {
     private transporter: Transporter;
 
     constructor(
-        @Inject(forwardRef(() => Environment))
-        private envService: Environment,
         @Inject(forwardRef(() => Logger))
         private logger: Logger,
+        private configService: ConfigService
     ) {
         this.transporter = nodemailer.createTransport({
-            host: this.envService.SMTP_HOST,
-            port: this.envService.SMTP_PORT,
-            secure: this.envService.SMTP_SECURE,
+            host: this.configService.get<string>('SMTP_HOST'),
+            port: this.configService.get<number>('SMTP_PORT'),
+            secure: this.configService.get<boolean>('SMTP_SECURE'),
             auth: {
-                user: this.envService.SMTP_USER,
-                pass: this.envService.SMTP_PASSWORD
+                user: this.configService.get<string>('SMTP_USER'),
+                pass: this.configService.get<string>('SMTP_PASSWORD')
             },
         });
     }

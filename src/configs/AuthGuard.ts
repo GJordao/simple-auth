@@ -7,6 +7,7 @@ import {
     Injectable,
     UnauthorizedException,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Observable } from 'rxjs';
 import { Repository } from 'typeorm';
@@ -15,7 +16,6 @@ import { Request } from "express";
 import { DbSession } from "../entities/DbSession";
 // Services
 import { Blocklist } from "./../services/Blocklist";
-import { Environment } from "./../services/Environment"
 import { Token } from "./../services/Token";
 
 const invalidTokenError = new HttpException({
@@ -27,10 +27,10 @@ const invalidTokenError = new HttpException({
 export class AuthGuard implements CanActivate {
     constructor(
         @Inject(Blocklist) private readonly blocklistService: Blocklist,
-        @Inject(Environment) private readonly envService: Environment,
         @Inject(Token) private readonly tokenService: Token,
         @InjectRepository(DbSession)
         private dbSessionRepository: Repository<DbSession>,
+        private configService: ConfigService
     ) {}
 
     canActivate(
@@ -57,13 +57,13 @@ export class AuthGuard implements CanActivate {
 
         let decodedToken = {};
         try {
-            decodedToken = this.tokenService.verify(token, this.envService.TOKEN_ENCRYPTION_KEY);            
+            decodedToken = this.tokenService.verify(token, this.configService.get<string>('TOKEN_ENCRYPTION_KEY'));
         } catch (error) {
             this.blocklistService.add(token);
             throw invalidTokenError;
         }
     
-        if(this.envService.DB_SESSIONS) {
+        if(this.configService.get<string>('DB_SESSIONS')) {
             const exists = this.dbSessionRepository.find({
                 token: token
             });

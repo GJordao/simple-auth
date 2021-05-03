@@ -4,10 +4,11 @@ import { NestFactory } from "@nestjs/core";
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { ValidationPipe } from "./configs/ValidationPipe";
 
+
 async function bootstrap() {
     const app = await NestFactory.create(AppModule);
     app.useGlobalPipes(new ValidationPipe());
-    const environmentInstance = app.get("Environment");
+    const configService = app.get('ConfigService');
     const loggerInstance = app.get("ConsoleLogger");
 
     const options = new DocumentBuilder()
@@ -19,8 +20,8 @@ async function bootstrap() {
     const document = SwaggerModule.createDocument(app, options);
     SwaggerModule.setup('auth/explorer', app, document);
 
-    loggerInstance.debug(`Started server on port: ${environmentInstance.PORT}`);
-    await app.listen(environmentInstance.PORT);
+    loggerInstance.debug(`Started server on port: ${configService.get('PORT')}`);
+    await app.listen(configService.get('PORT'));
 }
 
 bootstrap();

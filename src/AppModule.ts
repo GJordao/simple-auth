@@ -1,5 +1,8 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { validate as envValidate } from './configs/EnvValidation';
+
 // Controllers
 import { AccountController } from './controllers/AccountController';
 import { LoginController } from './controllers/LoginController';
@@ -10,7 +13,6 @@ import { RegisterController } from './controllers/RegisterController';
 import { ValidatorController } from "./controllers/ValidatorController";
 // Services
 import { Blocklist } from "./services/Blocklist";
-import { Environment } from "./services/Environment";
 import { Logger } from "./services/Logger";
 import { Mail } from "./services/Mail";
 import { Password } from "./services/Password";
@@ -18,26 +20,30 @@ import { Token } from "./services/Token";
 // Entities
 import { DbSession } from "./entities/DbSession";
 import { User } from "./entities/User";
+import { ConnectionOptions } from 'typeorm';
 
 @Module({
     imports: [
-        /**
-         * We can use process.env here
-         * The module Environment will throw an error 
-         * When initalised if any env vars are missing
-         */
-        TypeOrmModule.forRoot({
-            type: process.env.DATABASE_TYPE as any,
-            host: process.env.DATABASE_HOST,
-            port: Number(process.env.DATABASE_PORT),
-            username: process.env.DATABASE_USERNAME,
-            password: process.env.DATABASE_PASSWORD,
-            database: process.env.DATABASE_NAME,
-            entities: [DbSession, User],
-            entityPrefix: "simple_auth_",
-            synchronize: true,
+        TypeOrmModule.forRootAsync({
+            imports: [ConfigModule],
+            useFactory: (configService: ConfigService) => ({
+                type: configService.get('DATABASE_TYPE'),
+                host: configService.get('DATABASE_HOST'),
+                port: configService.get<number>('DATABASE_PORT'),
+                username: configService.get('DATABASE_USERNAME'),
+                password: configService.get('DATABASE_PASSWORD'),
+                database: configService.get('DATABASE_NAME'),
+                entities: [DbSession, User],
+                entityPrefix: "simple_auth_",
+                synchronize: true,
+            }  as ConnectionOptions),
+            inject: [ConfigService],
         }),
-        TypeOrmModule.forFeature([DbSession, User])
+        TypeOrmModule.forFeature([DbSession, User]),
+        ConfigModule.forRoot({
+            cache: true,
+            validate: envValidate
+        })
     ],
     controllers: [
         AccountController,
@@ -50,7 +56,6 @@ import { User } from "./entities/User";
     ],
     providers: [
         Blocklist,
-        Environment,
         Logger,
         Mail,
         Password,

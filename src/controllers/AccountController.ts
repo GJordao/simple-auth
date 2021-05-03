@@ -20,7 +20,6 @@ import { DbSession } from "../entities/DbSession";
 import { User } from "./../entities/User";
 // Services
 import { Blocklist } from "./../services/Blocklist";
-import { Environment } from "../services/Environment";
 import { Logger } from "./../services/Logger";
 import { Token } from "../services/Token";
 // DTOs
@@ -35,7 +34,6 @@ const invalidTokenError = new HttpException({
 export class AccountController {
     constructor(
         private readonly blocklistService: Blocklist,
-        private readonly envService: Environment,
         private readonly logger: Logger,
         private readonly tokenService: Token,
         @InjectRepository(DbSession)

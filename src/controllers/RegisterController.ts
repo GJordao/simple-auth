@@ -17,7 +17,6 @@ import { Repository } from 'typeorm';
 import { plainToClass } from 'class-transformer';
 import { ApiResponse } from '@nestjs/swagger';
 // Services
-import { Environment } from "../services/Environment";
 import { Password } from '../services/Password';
 import { Mail } from "./../services/Mail";
 // Entities
@@ -26,15 +25,16 @@ import { User } from "../entities/User";
 import { IncomingCrendetials } from "./DTOs/IncomingCredentials";
 import { OutgoingErrorMessage } from "./DTOs/OutgoingErrorMessage";
 import { OutgoingUser } from "./DTOs/OutgoingUser";
+import { ConfigService } from '@nestjs/config';
 
 @Controller()
 export class RegisterController {
     constructor(
-        private readonly envService: Environment,
         private readonly passwordService: Password,
         private readonly mailService: Mail,
         @InjectRepository(User)
-        private usersRepository: Repository<User>
+        private usersRepository: Repository<User>,
+        private configService: ConfigService
     ) {
     }
 
@@ -55,7 +55,7 @@ export class RegisterController {
             }, HttpStatus.BAD_REQUEST);
         }
     
-        const PASSWORD_PEPPER = this.envService.PASSWORD_PEPPER;
+        const PASSWORD_PEPPER = this.configService.get<string>('PASSWORD_PEPPER');
         const password = PASSWORD_PEPPER + credentials.password;
         const passwordHash = await this.passwordService.hash(password);
     
@@ -68,7 +68,7 @@ export class RegisterController {
             newUser.activationId = uuidv4();
             await this.usersRepository.save(newUser);
 
-            const redirectUrl = `${this.envService.AUTH_URL}/auth/register/activation?activationId=${newUser.activationId}`;
+            const redirectUrl = `${this.configService.get<string>('AUTH_URL')}/auth/register/activation?activationId=${newUser.activationId}`;
 
             this.mailService.send(
                 newUser.email,
@@ -114,7 +114,7 @@ export class RegisterController {
         user.accountActive = true;
         await this.usersRepository.update({id: user.id}, user);
 
-        let redirectUrl = this.envService.ACCOUNT_CONFIRMATION_REDIRECT_URL;
+        let redirectUrl = this.configService.get<string>('ACCOUNT_CONFIRMATION_REDIRECT_URL');
         if(redirectUrl.length === 0) {
             redirectUrl = `${request.protocol}://${request.headers.host}`;
         }
@@ -164,7 +164,7 @@ export class RegisterController {
         user.activationId = uuidv4();
         await this.usersRepository.update({id: user.id}, user);
 
-        const redirectUrl = `${this.envService.AUTH_URL}/auth/register?activationId=${user.activationId}`;
+        const redirectUrl = `${this.configService.get<string>('AUTH_URL')}/auth/register?activationId=${user.activationId}`;
 
         this.mailService.send(
             user.email,

@@ -10,6 +10,7 @@ import {
     Req,
     UseGuards,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { v4 as uuidv4 } from "uuid";
@@ -21,7 +22,6 @@ import { DbSession } from "../entities/DbSession";
 import { User } from "./../entities/User";
 // Services
 import { Blocklist } from "./../services/Blocklist";
-import { Environment } from "../services/Environment";
 import { Logger } from "./../services/Logger";
 import { Mail } from "./../services/Mail";
 import { Password } from "./../services/Password";
@@ -46,7 +46,6 @@ const invalidCredentialsError = new HttpException({
 export class PasswordController {
     constructor(
         private readonly blocklistService: Blocklist,
-        private readonly envService: Environment,
         private readonly logger: Logger,
         private readonly mailService: Mail,
         private readonly passwordService: Password,
@@ -55,6 +54,7 @@ export class PasswordController {
         private dbSessionRepository: Repository<DbSession>,
         @InjectRepository(User)
         private usersRepository: Repository<User>,
+        private configService: ConfigService
     ) {
     }
 
@@ -75,7 +75,7 @@ export class PasswordController {
             throw invalidTokenError;
         }
 
-        const PASSWORD_PEPPER = this.envService.PASSWORD_PEPPER;
+        const PASSWORD_PEPPER = this.configService.get<string>('PASSWORD_PEPPER');
         const doesPasswordMatch = await this.passwordService.compare(
             PASSWORD_PEPPER + body.password,
             user.password
@@ -120,7 +120,7 @@ export class PasswordController {
         user.passwordResetId = uuidv4();
         await this.usersRepository.save(user);
 
-        const redirectUrl = `${this.envService.PASSWORD_RESET_URL}?passwordResetId=${user.passwordResetId}`;
+        const redirectUrl = `${this.configService.get<string>('PASSWORD_RESET_URL')}?passwordResetId=${user.passwordResetId}`;
         this.mailService.send(
             user.email,
             "Password reset",
@@ -148,7 +148,7 @@ export class PasswordController {
             }, HttpStatus.BAD_REQUEST);
         }
 
-        const PASSWORD_PEPPER = this.envService.PASSWORD_PEPPER;
+        const PASSWORD_PEPPER = this.configService.get<string>('PASSWORD_PEPPER');
         const newPassword = PASSWORD_PEPPER + body.password;
         const passwordHash = await this.passwordService.hash(newPassword);
         user.password = passwordHash;
