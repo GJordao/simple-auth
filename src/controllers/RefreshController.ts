@@ -64,7 +64,7 @@ export class RefreshController {
                 { ignoreExpiration: true }
             );
 
-            if(this.configService.get<string>('DB_SESSIONS')) {
+            if(this.configService.get<boolean>('DB_SESSIONS')) {
                 const exists = this.dbSessionRepository.find({
                     token: token
                 });
@@ -108,7 +108,7 @@ export class RefreshController {
             );
 
             this.blocklistService.add(token);
-            if(this.configService.get<string>('DB_SESSIONS')) {
+            if(this.configService.get<boolean>('DB_SESSIONS')) {
                 await this.dbSessionRepository.delete({
                     token:token
                 });

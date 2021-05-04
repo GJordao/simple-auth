@@ -96,7 +96,7 @@ export class LoginController {
         response.bearer = { token: accessToken };
         response.refresh = {token: refreshToken };
 
-        if(this.configService.get<string>('DB_SESSIONS')) {
+        if(this.configService.get<boolean>('DB_SESSIONS')) {
             const dbSession = new DbSession();
             dbSession.token = accessToken;
             dbSession.user = user;

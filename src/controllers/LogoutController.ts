@@ -79,7 +79,7 @@ export class LogoutController {
             this.blocklistService.add(token);
             this.blocklistService.add(refreshToken);
 
-            if(this.configService.get<string>('DB_SESSIONS')) {
+            if(this.configService.get<boolean>('DB_SESSIONS')) {
                 await this.dbSessionRepository.delete({
                     token:token
                 });
@@ -87,7 +87,7 @@ export class LogoutController {
         } catch (error) {
             this.blocklistService.add(token);
             this.blocklistService.add(refreshToken);
-            if(this.configService.get<string>('DB_SESSIONS')) {
+            if(this.configService.get<boolean>('DB_SESSIONS')) {
                 await this.dbSessionRepository.delete({
                     token:token
                 });
