@@ -1,80 +1,79 @@
 import { Logger } from '@nestjs/common';
-import { plainToClass } from 'class-transformer';
-import { IsBoolean, IsDefined, IsNotEmpty, IsNumber, IsString, validateSync } from 'class-validator';
+import { plainToClass, Type } from 'class-transformer';
+import { IsDefined, IsIn, IsInt, IsNotEmpty, IsPort, IsPositive, ValidateIf, validateSync } from 'class-validator';
+
 
 class EnvironmentVariables {
-    @IsDefined()
-    @IsNotEmpty()
+    @IsIn(["mysql", "postgres"])
+    @IsDefined() @IsNotEmpty()
     DATABASE_TYPE: string;
 
-    @IsDefined()
-    @IsNotEmpty()
+    @IsDefined() @IsNotEmpty()
     DATABASE_HOST: string;
+    
+    @IsPort()
+    @IsDefined() @IsNotEmpty()
+    DATABASE_PORT: string;
 
-    @IsDefined()
-    @IsNotEmpty()
-    DATABASE_PORT: number;
-
-    @IsDefined()
-    @IsNotEmpty()
+    @IsDefined() @IsNotEmpty()
     DATABASE_USERNAME: string;
 
-    @IsDefined()
-    @IsNotEmpty()
+    @IsDefined() @IsNotEmpty()
     DATABASE_PASSWORD: string;
 
-    @IsDefined()
-    @IsNotEmpty()
+    @IsDefined() @IsNotEmpty()
     DATABASE_NAME: string;
 
-    @IsString()
     PASSWORD_PEPPER = '';
 
-    @IsNumber()
-    PORT = 5000;
+    @IsPort()
+    PORT = '5000';
 
-    @IsDefined()
-    @IsNotEmpty()
+    @IsDefined() @IsNotEmpty()
     TOKEN_ENCRYPTION_KEY: string;
 
-    @IsNumber()
+    @IsInt() @Type(() => Number)
     ACCESS_TOKEN_EXPIRE_TIME = 600;
 
-    @IsNumber()
+    @IsPositive() @IsInt() @Type(() => Number)
     REFRESH_TOKEN_EXPIRE_TIME = 2629743;
 
-    @IsString()
+    @IsIn(['prod', 'dev'])
     MODE = 'prod';
 
-    @IsString()
     SMTP_HOST = '';
 
-    @IsNumber()
-    SMTP_PORT = 25;
+    @IsPort()
+    @ValidateIf(o => !!o.SMTP_HOST)
+    @IsDefined() @IsNotEmpty()
+    SMTP_PORT = '25';
 
-    @IsBoolean()
+    @Type(() => Boolean)
     SMTP_SECURE = false;
 
-    @IsString()
+    @ValidateIf(o => !!o.SMTP_HOST)
+    @IsDefined() @IsNotEmpty()
     SMTP_USER = '';
 
-    @IsString()
+    @ValidateIf(o => !!o.SMTP_HOST)
+    @IsDefined() @IsNotEmpty()
     SMTP_PASSWORD = '';
 
-    @IsString()
+    @ValidateIf(o => !!o.SMTP_HOST)
+    @IsDefined() @IsNotEmpty()
     SMTP_MAIL_FROM = '';
 
-    @IsString()
+    @ValidateIf(o => !!o.SMTP_HOST)
+    @IsDefined() @IsNotEmpty()
     AUTH_URL = '';
 
-    @IsString()
     ACCOUNT_CONFIRMATION_REDIRECT_URL = '';
 
-    @IsBoolean()
+    @Type(() => Boolean)
     DB_SESSIONS = false;
 
-    @IsDefined()
-    @IsNotEmpty()
+    @ValidateIf(o => !!o.SMTP_HOST)
+    @IsDefined() @IsNotEmpty()
     PASSWORD_RESET_URL: string;
 }
 
