@@ -1,22 +1,23 @@
 import { INestApplication } from '@nestjs/common';
-import { User } from './TOs/User';
-import * as request from 'supertest';
+import { EnvironmentVariables } from 'src/configs/EnvValidation';
+import { Test, TestingModule } from '@nestjs/testing';
+import { AppModule } from '../AppModule';
 
-export async function registerUser(app: INestApplication, user: User) {
-    return await request(app.getHttpServer()).post('/auth/register').send(user);
-}
+export * from './constants';
 
-export async function loginUser(app: INestApplication, user: User) {
-    return await request(app.getHttpServer()).post('/auth/login').send(user);
-}
+export class BaseTestApp {
+    public app: INestApplication;
 
-export async function refreshBearerToken(
-    app: INestApplication,
-    bearerToken: string,
-    refreshToken: string
-) {
-    return await request(app.getHttpServer())
-        .post('/auth/refresh')
-        .send({ refreshToken })
-        .set('authorization', 'Bearer ' + bearerToken);
+    async setup(config: EnvironmentVariables) {
+        const moduleFixture: TestingModule = await Test.createTestingModule({
+            imports: [AppModule.register(config)]
+        }).compile();
+
+        this.app = moduleFixture.createNestApplication();
+        await this.app.init();
+    }
+
+    async teardown() {
+        await this.app.close();
+    }
 }

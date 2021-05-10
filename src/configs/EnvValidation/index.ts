@@ -11,32 +11,31 @@ import {
     ValidateIf,
     validateSync
 } from 'class-validator';
+import {
+    IsDefinedAndNotEmptyIfIsMysqlOrPostgres,
+    IsPortIfIsMysqlOrPostgres
+} from './Decorators';
 
 export class EnvironmentVariables {
-    @IsIn(['mysql', 'postgres', 'sqlite'])
+    @IsIn(['mysql', 'postgres', 'test'])
     @IsDefined()
     @IsNotEmpty()
     DATABASE_TYPE: string;
 
-    @IsDefined()
-    @IsNotEmpty()
+    @IsDefinedAndNotEmptyIfIsMysqlOrPostgres()
     DATABASE_HOST: string;
 
-    @IsPort()
-    @IsDefined()
-    @IsNotEmpty()
+    @IsPortIfIsMysqlOrPostgres()
+    @IsDefinedAndNotEmptyIfIsMysqlOrPostgres()
     DATABASE_PORT: string;
 
-    @IsDefined()
-    @IsNotEmpty()
+    @IsDefinedAndNotEmptyIfIsMysqlOrPostgres()
     DATABASE_USERNAME: string;
 
-    @IsDefined()
-    @IsNotEmpty()
+    @IsDefinedAndNotEmptyIfIsMysqlOrPostgres()
     DATABASE_PASSWORD: string;
 
-    @IsDefined()
-    @IsNotEmpty()
+    @IsDefinedAndNotEmptyIfIsMysqlOrPostgres()
     DATABASE_NAME: string;
 
     PASSWORD_PEPPER = '';

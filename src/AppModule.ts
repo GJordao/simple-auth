@@ -39,12 +39,18 @@ export class AppModule {
                     imports: [ConfigModule],
                     useFactory: (configService: ConfigService) =>
                         ({
-                            type: configService.get('DATABASE_TYPE'),
+                            type:
+                                configService.get('DATABASE_TYPE') === 'test'
+                                    ? 'sqlite'
+                                    : configService.get('DATABASE_TYPE'),
                             host: configService.get('DATABASE_HOST'),
                             port: configService.get<number>('DATABASE_PORT'),
                             username: configService.get('DATABASE_USERNAME'),
                             password: configService.get('DATABASE_PASSWORD'),
-                            database: configService.get('DATABASE_NAME'),
+                            database:
+                                configService.get('DATABASE_TYPE') === 'test'
+                                    ? ':memory:'
+                                    : configService.get('DATABASE_NAME'),
                             entities: [DbSession, User],
                             entityPrefix: 'simple_auth_',
                             synchronize: true

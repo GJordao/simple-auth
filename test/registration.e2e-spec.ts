@@ -1,28 +1,20 @@
-// import { Test, TestingModule } from '@nestjs/testing';
-// import { INestApplication } from '@nestjs/common';
-import { loginUser, registerUser, refreshBearerToken } from '../src/testing';
-import * as request from 'supertest';
-import { AppMemoryDb } from '../src/testing/AppMemSetup';
+import { JWT_PATTERN } from '../src/testing';
 import { User } from 'src/testing/TOs';
-import { EnvironmentVariables } from 'src/configs/EnvValidation';
+import { EnvironmentVariables } from '../src/configs/EnvValidation';
+import { RegistrationTestApp } from '../src/testing/RegistrationTestApp';
 
 describe('Registration (e2e)', () => {
-    const appMem = new AppMemoryDb();
+    const testApp = new RegistrationTestApp();
 
     beforeEach(async () => {
-        await appMem.setup({
-            DATABASE_TYPE: 'sqlite',
-            DATABASE_NAME: ':memory:',
-            DATABASE_HOST: 'localhost',
-            DATABASE_PORT: '5432',
-            DATABASE_USERNAME: 'jack',
-            DATABASE_PASSWORD: 'jack-password',
+        await testApp.setup({
+            DATABASE_TYPE: 'test',
             TOKEN_ENCRYPTION_KEY: 'some-key'
         } as EnvironmentVariables);
     });
 
     afterEach(async () => {
-        await appMem.teardown();
+        await testApp.teardown();
     });
 
     it('registers a new user successfully', async () => {
@@ -30,9 +22,7 @@ describe('Registration (e2e)', () => {
         const {
             status,
             body: { email }
-        } = await request(appMem.app.getHttpServer())
-            .post('/auth/register')
-            .send(jack);
+        } = await testApp.registerUser(jack);
         expect(status).toBe(201);
         expect(email).toBe(jack.email);
     });
@@ -40,17 +30,17 @@ describe('Registration (e2e)', () => {
     it('fails to register the same user twice', async () => {
         const jack: User = { email: 'jack@mail.com', password: 'qwe' };
 
-        const { status } = await registerUser(appMem.app, jack);
+        const { status } = await testApp.registerUser(jack);
         expect(status).toBe(201);
 
-        const { status: statusRepeat } = await registerUser(appMem.app, jack);
+        const { status: statusRepeat } = await testApp.registerUser(jack);
         expect(statusRepeat).toBe(400);
     });
 
     it('logs in successfully an already registered user', async () => {
         const jack: User = { email: 'jack@mail.com', password: 'qwe' };
 
-        const { status } = await registerUser(appMem.app, jack);
+        const { status } = await testApp.registerUser(jack);
         expect(status).toBe(201);
 
         const {
@@ -59,31 +49,29 @@ describe('Registration (e2e)', () => {
                 bearer: { token: bearerToken },
                 refresh: { token: refreshToken }
             }
-        } = await loginUser(appMem.app, jack);
+        } = await testApp.loginUser(jack);
         expect(loginStatus).toBe(201);
-        expect(bearerToken).toMatch(/.*..*..*/);
-        expect(refreshToken).toMatch(/.*..*..*/);
+
+        expect(bearerToken).toMatch(JWT_PATTERN);
+        expect(refreshToken).toMatch(JWT_PATTERN);
     });
 
     it('fails to login with an already registered user, providing wrong credentials', async () => {
         const jack: User = { email: 'jack@mail.com', password: 'qwe' };
         const fakeJack = { ...jack, password: 'asd' };
 
-        const { status } = await registerUser(appMem.app, jack);
+        const { status } = await testApp.registerUser(jack);
         expect(status).toBe(201);
 
-        const { status: loginStatus, body } = await loginUser(
-            appMem.app,
-            fakeJack
-        );
+        const { status: loginStatus } = await testApp.loginUser(fakeJack);
 
         expect(loginStatus).toBe(400);
     });
 
-    it('obtains a new Bearer token given a valid refresh token', async () => {
+    it.skip('obtains a new Bearer token given a valid refresh token', async () => {
         const jack: User = { email: 'jack@mail.com', password: 'qwe' };
 
-        const { status } = await registerUser(appMem.app, jack);
+        const { status } = await testApp.registerUser(jack);
         expect(status).toBe(201);
 
         const {
@@ -92,7 +80,7 @@ describe('Registration (e2e)', () => {
                 bearer: { token: bearerToken },
                 refresh: { token: refreshToken }
             }
-        } = await loginUser(appMem.app, jack);
+        } = await testApp.loginUser(jack);
         expect(loginStatus).toBe(201);
 
         const {
@@ -100,11 +88,8 @@ describe('Registration (e2e)', () => {
             body: {
                 bearer: { token: newBearerToken }
             }
-        } = await refreshBearerToken(appMem.app, bearerToken, refreshToken);
+        } = await testApp.refreshBearerToken(bearerToken, refreshToken);
         expect(refreshStatus).toBe(201);
-        // expect(newBearerToken).not.toEqual(bearerToken);
         expect(bearerToken).not.toEqual(newBearerToken);
-
-        // expect(refres).toMatch(/.*..*..*/);
     });
 });
