@@ -4,14 +4,17 @@ import { NestFactory } from '@nestjs/core';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { ValidationPipe } from './configs/ValidationPipe';
 import { EnvironmentVariables } from './configs/EnvValidation';
+import { LoggerWinstonService } from './logger/LoggerWinstonService';
 
 async function bootstrap() {
     const app = await NestFactory.create(
-        AppModule.register({} as EnvironmentVariables)
+        AppModule.register({} as EnvironmentVariables),
+        { logger: false }
     );
+    app.useLogger(app.get(LoggerWinstonService));
     app.useGlobalPipes(new ValidationPipe());
     const configService = app.get('ConfigService');
-    const loggerInstance = app.get('ConsoleLogger');
+    const logger = await app.get('LoggerWinstonService').asyncSetup();
 
     const options = new DocumentBuilder()
         .setTitle('Simple-Auth')
@@ -24,8 +27,9 @@ async function bootstrap() {
     const document = SwaggerModule.createDocument(app, options);
     SwaggerModule.setup('auth/explorer', app, document);
 
-    loggerInstance.debug(
-        `Started server on port: ${configService.get('PORT')}`
+    logger.debug(
+        `Started server on port: ${configService.get('PORT')}`,
+        'Bootstrap'
     );
     await app.listen(configService.get('PORT'));
 }

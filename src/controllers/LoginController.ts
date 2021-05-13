@@ -13,7 +13,6 @@ import {
     ApiResponse
 } from '@nestjs/swagger';
 // Services
-import { Logger } from "../services/Logger";
 import { Password } from '../services/Password';
 import { Token } from "../services/Token";
 // Entities
@@ -23,6 +22,7 @@ import { User } from "../entities/User";
 import { IncomingCrendetials } from "./DTOs/IncomingCredentials";
 import { OutgoingErrorMessage } from "./DTOs/OutgoingErrorMessage";
 import { OutgoingTokens } from "./DTOs/OutgoingTokens";
+import { LoggerWinstonService } from '../logger/LoggerWinstonService';
 
 
 const invalidCredentialsError = new HttpException({
@@ -38,7 +38,8 @@ const inactiveAccountError = new HttpException({
 @Controller()
 export class LoginController {
     constructor(
-        private readonly logger: Logger,
+        // private readonly logger: Logger,
+        private readonly logger: LoggerWinstonService,
         private readonly passwordService: Password,
         private readonly tokenService: Token,
         @InjectRepository(User)

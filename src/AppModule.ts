@@ -16,10 +16,10 @@ import { RegisterController } from './controllers/RegisterController';
 import { ValidatorController } from './controllers/ValidatorController';
 // Services
 import { Blocklist } from './services/Blocklist';
-import { Logger } from './services/Logger';
 import { Mail } from './services/Mail';
 import { Password } from './services/Password';
 import { Token } from './services/Token';
+import { LoggerWinstonModule } from './logger/LoggerWinstonModule';
 // Entities
 import { DbSession } from './entities/DbSession';
 import { User } from './entities/User';
@@ -61,7 +61,8 @@ export class AppModule {
                 ConfigModule.forRoot({
                     cache: true,
                     validate: envValidate
-                })
+                }),
+                LoggerWinstonModule
             ],
             controllers: [
                 AccountController,
@@ -72,7 +73,7 @@ export class AppModule {
                 RegisterController,
                 ValidatorController
             ],
-            providers: [Blocklist, Logger, Mail, Password, Token, ConfigService]
+            providers: [Blocklist, Mail, Password, Token, ConfigService]
         };
     }
 }

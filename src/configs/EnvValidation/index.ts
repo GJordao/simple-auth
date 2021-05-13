@@ -9,7 +9,8 @@ import {
     IsPort,
     IsPositive,
     ValidateIf,
-    validateSync
+    validateSync,
+    Length
 } from 'class-validator';
 import {
     IsDefinedAndNotEmptyIfIsMysqlOrPostgres,
@@ -56,7 +57,7 @@ export class EnvironmentVariables {
     @Type(() => Number)
     REFRESH_TOKEN_EXPIRE_TIME = 2629743;
 
-    @IsIn(['prod', 'dev'])
+    @IsIn(['prod', 'dev', 'test'])
     MODE = 'prod';
 
     SMTP_HOST = '';
@@ -99,6 +100,16 @@ export class EnvironmentVariables {
     @IsDefined()
     @IsNotEmpty()
     PASSWORD_RESET_URL: string;
+
+    @IsIn(['verbose', 'debug', 'info', 'warn', 'error'])
+    LOG_LEVEL = 'info';
+
+    @Type(() => Boolean)
+    FILE_LOGGING = true;
+
+    @ValidateIf((o) => o.LOG_FILE_ENABLED)
+    @Length(1, 50)
+    LOG_FOLDER_PREFIX = 'sa_';
 }
 
 export function validate(config: Record<string, unknown>) {

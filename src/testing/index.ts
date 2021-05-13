@@ -14,6 +14,7 @@ export class BaseTestApp {
         }).compile();
 
         this.app = moduleFixture.createNestApplication();
+        await this.app.get('LoggerWinstonService').asyncSetup();
         await this.app.init();
     }
 

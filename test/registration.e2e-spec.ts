@@ -9,7 +9,8 @@ describe('Registration (e2e)', () => {
     beforeEach(async () => {
         await testApp.setup({
             DATABASE_TYPE: 'test',
-            TOKEN_ENCRYPTION_KEY: 'some-key'
+            TOKEN_ENCRYPTION_KEY: 'some-key',
+            MODE: 'test'
         } as EnvironmentVariables);
     });
 

@@ -1,54 +1,61 @@
 // Packages
-import { 
+import {
     Controller,
     Delete,
     HttpException,
     HttpStatus,
     Req,
-    UseGuards,
+    UseGuards
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { 
-    ApiBearerAuth,
-    ApiResponse
-} from '@nestjs/swagger';
+import { ApiBearerAuth, ApiResponse } from '@nestjs/swagger';
 // Configs
-import {AuthGuard} from "../configs/AuthGuard";
+import { AuthGuard } from '../configs/AuthGuard';
 // Entities
-import { DbSession } from "../entities/DbSession";
-import { User } from "./../entities/User";
+import { DbSession } from '../entities/DbSession';
+import { User } from './../entities/User';
 // Services
-import { Blocklist } from "./../services/Blocklist";
-import { Logger } from "./../services/Logger";
-import { Token } from "../services/Token";
+import { Blocklist } from './../services/Blocklist';
+import { Token } from '../services/Token';
 // DTOs
-import { OutgoingErrorMessage } from "./DTOs/OutgoingErrorMessage";
+import { OutgoingErrorMessage } from './DTOs/OutgoingErrorMessage';
+import { LoggerWinstonService } from '../logger/LoggerWinstonService';
 
-const invalidTokenError = new HttpException({
-    statusCode: HttpStatus.BAD_REQUEST,
-    message: "Invalid tokens sent through",
-}, HttpStatus.BAD_REQUEST);
+const invalidTokenError = new HttpException(
+    {
+        statusCode: HttpStatus.BAD_REQUEST,
+        message: 'Invalid tokens sent through'
+    },
+    HttpStatus.BAD_REQUEST
+);
 
 @Controller()
 export class AccountController {
     constructor(
         private readonly blocklistService: Blocklist,
-        private readonly logger: Logger,
+        private readonly logger: LoggerWinstonService,
         private readonly tokenService: Token,
         @InjectRepository(DbSession)
         private dbSessionRepository: Repository<DbSession>,
         @InjectRepository(User)
         private userRepository: Repository<User>
-    ) {
-    }
+    ) {}
 
-    @Delete("/auth/account")
+    @Delete('/auth/account')
     @UseGuards(AuthGuard)
     @ApiBearerAuth()
-    @ApiResponse({ status: 200, description: 'The account was deleted'})
-    @ApiResponse({ status: 400, description: 'Invalid tokens sent through', type: OutgoingErrorMessage})
-    @ApiResponse({ status: 500, description: 'Server error', type: OutgoingErrorMessage})
+    @ApiResponse({ status: 200, description: 'The account was deleted' })
+    @ApiResponse({
+        status: 400,
+        description: 'Invalid tokens sent through',
+        type: OutgoingErrorMessage
+    })
+    @ApiResponse({
+        status: 500,
+        description: 'Server error',
+        type: OutgoingErrorMessage
+    })
     async refresh(@Req() request: any): Promise<any> {
         const decodedAccessToken = request.user;
 
@@ -56,7 +63,7 @@ export class AccountController {
             id: decodedAccessToken.id
         });
 
-        if(!user) {
+        if (!user) {
             throw invalidTokenError;
         }
 
