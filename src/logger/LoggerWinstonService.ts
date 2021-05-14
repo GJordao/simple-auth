@@ -1,9 +1,9 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import * as winston from 'winston';
 import { mkdtemp, mkdir } from 'fs/promises';
 import * as path from 'path';
 import * as os from 'os';
+import { ConfigServiceApi } from '../Config';
 
 const ERROR_LOG = 'error.log';
 const COMBINED_LOG = 'combined.log';
@@ -35,9 +35,9 @@ export class LoggerWinstonService extends Logger {
     logFolder: string;
     logPrefix: string;
 
-    constructor(private configService: ConfigService) {
+    constructor(private configApi: ConfigServiceApi) {
         super('', true);
-        this.logPrefix = configService.get('LOG_FOLDER_PREFIX');
+        this.logPrefix = configApi.LOG_FOLDER_PREFIX;
         this.setContext('Logger');
 
         this.winstonLogger = winston.createLogger({
@@ -45,7 +45,7 @@ export class LoggerWinstonService extends Logger {
             levels: LOG_LEVELS
         });
 
-        if (this.configService.get('MODE') === 'dev') {
+        if (this.configApi.MODE === 'dev') {
             this.winstonLogger.add(
                 new winston.transports.Console({
                     format: winston.format.combine(
@@ -58,7 +58,7 @@ export class LoggerWinstonService extends Logger {
     }
 
     async asyncSetup(): Promise<LoggerWinstonService> {
-        if (this.configService.get('FILE_LOGGING')) {
+        if (this.configApi.FILE_LOGGING) {
             try {
                 const targetfolder = path.join(
                     os.tmpdir(),
@@ -102,7 +102,8 @@ export class LoggerWinstonService extends Logger {
                 })
             );
 
-            this.info(`File logging enabled: ${this.logFolder}`, 'Logger');
+            const fileLoggingLocationMsg = `File logging enabled: ${this.logFolder}`;
+            this.info(fileLoggingLocationMsg, 'Logger');
         }
 
         return this;
@@ -110,7 +111,7 @@ export class LoggerWinstonService extends Logger {
 
     _isLogLevelEnabled(level): boolean {
         return (
-            LOG_LEVELS[level] <= LOG_LEVELS[this.configService.get('LOG_LEVEL')]
+            LOG_LEVELS[level] <= LOG_LEVELS[this.configApi.LOG_LEVEL]
         );
     }
 

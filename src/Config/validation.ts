@@ -106,7 +106,7 @@ export class EnvironmentVariables {
     @IsNotEmpty()
     PASSWORD_RESET_URL: string;
 
-    @IsIn(['verbose', 'debug', 'info', 'warn', 'error'])
+    @IsIn(['debug', 'info', 'warn', 'error'])
     LOG_LEVEL = 'info';
 
     @Type(() => Boolean)

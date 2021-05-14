@@ -211,6 +211,28 @@ Below you will find a list of all the available variables, their description and
 - **Description**: If you set this to true user sessions will be saved to the database and compared each time. This will be safer as the service will be able to track which sessions are active, but it will be slower as it requires reading and writing to the database.
 - **Default Value**: false
 
+## LOG_LEVEL
+
+- **Required**: false
+- **Type**: string
+- **Description**: Sets the application logging level. Allowed levels are: `debug`, `info`, `warn` and `error`.
+- **Default Value**: `info`.
+
+## FILE_LOGGING
+
+- **Required**: false
+- **Type**: boolean
+- **Description**: Sets whether logging to a unique temporary directory in the file system is enabled or disabled. The function used to create the temporary folder is [mkdtemp](https://nodejs.org/api/fs.html#fs_fspromises_mkdtemp_prefix_options).
+- **Default Value**: true.
+
+## LOG_FOLDER_PREFIX
+
+- **Required**: false
+- **Type**: string
+- **Description**: This is a prefix added to the name of the temporary folder created for file logging.
+- **Default**: 'sa_'
+
+
 # Development
 
 ## Installation
