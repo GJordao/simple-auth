@@ -19,14 +19,16 @@ import { ApiResponse } from '@nestjs/swagger';
 // Services
 import { Password } from '../services/Password';
 import { Mail } from './../services/Mail';
+import { ConfigServiceApi } from '../Config';
+import { LoggerWinstonService } from '../logger/LoggerWinstonService';
 // Entities
 import { User } from '../entities/User';
 // DTOs
 import { IncomingCrendetials } from './DTOs/IncomingCredentials';
 import { OutgoingErrorMessage } from './DTOs/OutgoingErrorMessage';
 import { OutgoingUser } from './DTOs/OutgoingUser';
-import { ConfigService } from '@nestjs/config';
-import { LoggerWinstonService } from '../logger/LoggerWinstonService';
+
+
 
 @Controller()
 export class RegisterController {
@@ -35,8 +37,8 @@ export class RegisterController {
         private readonly mailService: Mail,
         @InjectRepository(User)
         private usersRepository: Repository<User>,
-        private configService: ConfigService,
-        private logger: LoggerWinstonService
+        private logger: LoggerWinstonService,
+        private configApi: ConfigServiceApi
     ) {
         logger.setContext('Register');
     }
@@ -71,9 +73,7 @@ export class RegisterController {
             );
         }
 
-        const PASSWORD_PEPPER = this.configService.get<string>(
-            'PASSWORD_PEPPER'
-        );
+        const PASSWORD_PEPPER = this.configApi.PASSWORD_PEPPER;
         const password = PASSWORD_PEPPER + credentials.password;
         const passwordHash = await this.passwordService.hash(password);
 
@@ -86,9 +86,7 @@ export class RegisterController {
             newUser.activationId = uuidv4();
             await this.usersRepository.save(newUser);
 
-            const redirectUrl = `${this.configService.get<string>(
-                'AUTH_URL'
-            )}/auth/register/activation?activationId=${newUser.activationId}`;
+            const redirectUrl = `${this.configApi.AUTH_URL}/auth/register/activation?activationId=${newUser.activationId}`;
 
             this.mailService.send(
                 newUser.email,
@@ -153,9 +151,7 @@ export class RegisterController {
         user.accountActive = true;
         await this.usersRepository.update({ id: user.id }, user);
 
-        let redirectUrl = this.configService.get<string>(
-            'ACCOUNT_CONFIRMATION_REDIRECT_URL'
-        );
+        let redirectUrl = this.configApi.ACCOUNT_CONFIRMATION_REDIRECT_URL;
         if (redirectUrl.length === 0) {
             redirectUrl = `${request.protocol}://${request.headers.host}`;
         }
@@ -228,9 +224,7 @@ export class RegisterController {
         user.activationId = uuidv4();
         await this.usersRepository.update({ id: user.id }, user);
 
-        const redirectUrl = `${this.configService.get<string>(
-            'AUTH_URL'
-        )}/auth/register?activationId=${user.activationId}`;
+        const redirectUrl = `${this.configApi.AUTH_URL}/auth/register?activationId=${user.activationId}`;
 
         this.mailService.send(
             user.email,

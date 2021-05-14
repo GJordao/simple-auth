@@ -1,10 +1,11 @@
 import { DynamicModule, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { ConfigModule, ConfigService } from '@nestjs/config';
 import {
+    ConfigModule,
+    ConfigServiceApi,
     validate as envValidate,
     EnvironmentVariables
-} from './configs/EnvValidation';
+} from './Config';
 
 // Controllers
 import { AccountController } from './controllers/AccountController';
@@ -37,25 +38,25 @@ export class AppModule {
             imports: [
                 TypeOrmModule.forRootAsync({
                     imports: [ConfigModule],
-                    useFactory: (configService: ConfigService) =>
+                    useFactory: (configApi: ConfigServiceApi) =>
                         ({
                             type:
-                                configService.get('DATABASE_TYPE') === 'test'
+                                configApi.DATABASE_TYPE === 'test'
                                     ? 'sqlite'
-                                    : configService.get('DATABASE_TYPE'),
-                            host: configService.get('DATABASE_HOST'),
-                            port: configService.get<number>('DATABASE_PORT'),
-                            username: configService.get('DATABASE_USERNAME'),
-                            password: configService.get('DATABASE_PASSWORD'),
+                                    : configApi.DATABASE_TYPE,
+                            host: configApi.DATABASE_HOST,
+                            port: configApi.DATABASE_PORT,
+                            username: configApi.DATABASE_USERNAME,
+                            password: configApi.DATABASE_PASSWORD,
                             database:
-                                configService.get('DATABASE_TYPE') === 'test'
+                                configApi.DATABASE_TYPE === 'test'
                                     ? ':memory:'
-                                    : configService.get('DATABASE_NAME'),
+                                    : configApi.DATABASE_NAME,
                             entities: [DbSession, User],
                             entityPrefix: 'simple_auth_',
                             synchronize: true
                         } as ConnectionOptions),
-                    inject: [ConfigService]
+                    inject: [ConfigServiceApi]
                 }),
                 TypeOrmModule.forFeature([DbSession, User]),
                 ConfigModule.forRoot({
@@ -73,7 +74,13 @@ export class AppModule {
                 RegisterController,
                 ValidatorController
             ],
-            providers: [Blocklist, Mail, Password, Token, ConfigService]
+            providers: [
+                Blocklist,
+                Mail,
+                Password,
+                Token,
+                ConfigServiceApi
+            ]
         };
     }
 }

@@ -1,11 +1,11 @@
 import { Inject, Injectable, forwardRef } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
+import { ConfigServiceApi } from '../../Config';
 import ILogger from "./ILogger";
 
 @Injectable()
 export class ConsoleLogger implements ILogger {
     constructor(
-        private configService: ConfigService
+        private configApi: ConfigServiceApi
     ) {
 
     }
@@ -15,7 +15,7 @@ export class ConsoleLogger implements ILogger {
     }
 
     debug(message: string): void {
-        if(this.configService.get<string>('MODE') === "dev") {
+        if(this.configApi.MODE === "dev") {
             console.log(message);
         }
     }

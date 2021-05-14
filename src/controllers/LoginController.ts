@@ -6,7 +6,6 @@ import {
     HttpStatus,
     Post, 
 } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { 
@@ -15,6 +14,7 @@ import {
 // Services
 import { Password } from '../services/Password';
 import { Token } from "../services/Token";
+import { ConfigServiceApi } from '../Config';
 // Entities
 import { DbSession } from "../entities/DbSession";
 import { User } from "../entities/User";
@@ -23,6 +23,7 @@ import { IncomingCrendetials } from "./DTOs/IncomingCredentials";
 import { OutgoingErrorMessage } from "./DTOs/OutgoingErrorMessage";
 import { OutgoingTokens } from "./DTOs/OutgoingTokens";
 import { LoggerWinstonService } from '../logger/LoggerWinstonService';
+
 
 
 const invalidCredentialsError = new HttpException({
@@ -46,7 +47,7 @@ export class LoginController {
         private usersRepository: Repository<User>,
         @InjectRepository(DbSession)
         private dbSessionRepository: Repository<DbSession>,
-        private configService: ConfigService
+        private configApi: ConfigServiceApi
     ) {
     }
 
@@ -58,7 +59,7 @@ export class LoginController {
         @Body()
             credentials: IncomingCrendetials
     ): Promise<OutgoingTokens> {
-        const PASSWORD_PEPPER = this.configService.get<string>('PASSWORD_PEPPER');
+        const PASSWORD_PEPPER = this.configApi.PASSWORD_PEPPER;
         const user = await this.usersRepository.findOne({ email: credentials.email });
         if (!user) {
             throw invalidCredentialsError;
@@ -79,17 +80,17 @@ export class LoginController {
 
         const accessToken = this.tokenService.sign(
             { id: user.id, email: user.email },
-            this.configService.get<string>('TOKEN_ENCRYPTION_KEY'),
+            this.configApi.TOKEN_ENCRYPTION_KEY,
             {
-                expiresIn: this.configService.get<number>('ACCESS_TOKEN_EXPIRE_TIME'),
+                expiresIn: this.configApi.ACCESS_TOKEN_EXPIRE_TIME,
             }
         );
 
         const refreshToken = this.tokenService.sign(
             { id: user.id, email: user.email, isRefresh: true },
-            this.configService.get<string>('TOKEN_ENCRYPTION_KEY'),
+            this.configApi.TOKEN_ENCRYPTION_KEY,
             {
-                expiresIn: this.configService.get<string>('ACCESS_TOKEN_EXPIRE_TIME'),
+                expiresIn: this.configApi.ACCESS_TOKEN_EXPIRE_TIME,
             }
         );
         
@@ -97,7 +98,7 @@ export class LoginController {
         response.bearer = { token: accessToken };
         response.refresh = {token: refreshToken };
 
-        if(this.configService.get<boolean>('DB_SESSIONS')) {
+        if(this.configApi.DB_SESSIONS) {
             const dbSession = new DbSession();
             dbSession.token = accessToken;
             dbSession.user = user;

@@ -17,9 +17,10 @@ import { DbSession } from "../entities/DbSession";
 // Services
 import { Blocklist } from "./../services/Blocklist";
 import { Token } from "../services/Token";
+import { ConfigServiceApi } from '../Config';
 // DTOs
 import { OutgoingErrorMessage } from "./DTOs/OutgoingErrorMessage";
-import { ConfigService } from '@nestjs/config';
+
 
 @Controller()
 export class ValidatorController {
@@ -28,7 +29,7 @@ export class ValidatorController {
         private readonly tokenService: Token,
         @InjectRepository(DbSession)
         private dbSessionRepository: Repository<DbSession>,
-        private configService: ConfigService
+        private configApi: ConfigServiceApi
     ) {
     }
 

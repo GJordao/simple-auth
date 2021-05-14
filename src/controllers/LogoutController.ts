@@ -8,7 +8,6 @@ import {
     Post,
     UseGuards,
 } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { 
@@ -22,9 +21,11 @@ import { DbSession } from "../entities/DbSession";
 // Services
 import { Blocklist } from "./../services/Blocklist";
 import { Token } from "../services/Token";
+import { ConfigServiceApi } from '../Config';
 // DTOs
 import { OutgoingErrorMessage } from "./DTOs/OutgoingErrorMessage";
 import { IncomingRefreshToken }  from "./DTOs/IncomingRefreshToken";
+
 
 
 const invalidTokenError = new HttpException({
@@ -39,7 +40,7 @@ export class LogoutController {
         private readonly tokenService: Token,
         @InjectRepository(DbSession)
         private dbSessionRepository: Repository<DbSession>,
-        private configService: ConfigService
+        private configApi: ConfigServiceApi
     ) {
     }
 
@@ -60,12 +61,12 @@ export class LogoutController {
         try {
             const decodedAccessToken = this.tokenService.verify(
                 token,
-                this.configService.get<string>('TOKEN_ENCRYPTION_KEY')
+                this.configApi.TOKEN_ENCRYPTION_KEY
             );
             
             const decodedRefreshToken = this.tokenService.verify(
                 refreshToken,
-                this.configService.get<string>('TOKEN_ENCRYPTION_KEY')
+                this.configApi.TOKEN_ENCRYPTION_KEY
             );
 
             if(!decodedRefreshToken.isRefresh) {
@@ -79,7 +80,7 @@ export class LogoutController {
             this.blocklistService.add(token);
             this.blocklistService.add(refreshToken);
 
-            if(this.configService.get<boolean>('DB_SESSIONS')) {
+            if(this.configApi.DB_SESSIONS) {
                 await this.dbSessionRepository.delete({
                     token:token
                 });
@@ -87,7 +88,7 @@ export class LogoutController {
         } catch (error) {
             this.blocklistService.add(token);
             this.blocklistService.add(refreshToken);
-            if(this.configService.get<boolean>('DB_SESSIONS')) {
+            if(this.configApi.DB_SESSIONS) {
                 await this.dbSessionRepository.delete({
                     token:token
                 });

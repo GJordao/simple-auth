@@ -1,5 +1,5 @@
 import { INestApplication } from '@nestjs/common';
-import { EnvironmentVariables } from 'src/configs/EnvValidation';
+import { EnvironmentVariables } from '../Config';
 import { Test, TestingModule } from '@nestjs/testing';
 import { AppModule } from '../AppModule';
 

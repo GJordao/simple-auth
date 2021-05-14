@@ -28,7 +28,8 @@ export class EnvironmentVariables {
 
     @IsPortIfIsMysqlOrPostgres()
     @IsDefinedAndNotEmptyIfIsMysqlOrPostgres()
-    DATABASE_PORT: string;
+    @Type(() => Number)
+    DATABASE_PORT: number;
 
     @IsDefinedAndNotEmptyIfIsMysqlOrPostgres()
     DATABASE_USERNAME: string;
@@ -41,8 +42,10 @@ export class EnvironmentVariables {
 
     PASSWORD_PEPPER = '';
 
-    @IsPort()
-    PORT = '5000';
+    @IsPositive()
+    @IsInt()
+    @Type(() => Number)
+    PORT = 5000;
 
     @IsDefined()
     @IsNotEmpty()
@@ -62,11 +65,13 @@ export class EnvironmentVariables {
 
     SMTP_HOST = '';
 
-    @IsPort()
+    @IsPositive()
+    @IsInt()
     @ValidateIf((o) => !!o.SMTP_HOST)
     @IsDefined()
     @IsNotEmpty()
-    SMTP_PORT: string;
+    @Type(() => Number)
+    SMTP_PORT: number;
 
     @Type(() => Boolean)
     SMTP_SECURE = false;
