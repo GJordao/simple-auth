@@ -1,6 +1,6 @@
 import { JWT_PATTERN } from '../src/testing';
 import { User } from 'src/testing/TOs';
-import { EnvironmentVariables } from '../src/configs/EnvValidation';
+import { EnvironmentVariables } from '../src/Config';
 import { RegistrationTestApp } from '../src/testing/RegistrationTestApp';
 
 describe('Registration (e2e)', () => {
@@ -19,6 +19,7 @@ describe('Registration (e2e)', () => {
 
     it('registers a new user successfully', async () => {
         const jack: User = { email: 'jack@mail.com', password: '' };
+
         const {
             status,
             body: { email }

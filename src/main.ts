@@ -3,14 +3,14 @@ import { AppModule } from './AppModule';
 import { NestFactory } from '@nestjs/core';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { ValidationPipe } from './configs/ValidationPipe';
-import { EnvironmentVariables } from './configs/EnvValidation';
+import { EnvironmentVariables } from './Config';
 
 async function bootstrap() {
     const app = await NestFactory.create(
         AppModule.register({} as EnvironmentVariables)
     );
     app.useGlobalPipes(new ValidationPipe());
-    const configService = app.get('ConfigService');
+    const configApi = app.get('ConfigServiceApi');
     const loggerInstance = app.get('ConsoleLogger');
 
     const options = new DocumentBuilder()
@@ -24,10 +24,8 @@ async function bootstrap() {
     const document = SwaggerModule.createDocument(app, options);
     SwaggerModule.setup('auth/explorer', app, document);
 
-    loggerInstance.debug(
-        `Started server on port: ${configService.get('PORT')}`
-    );
-    await app.listen(configService.get('PORT'));
+    loggerInstance.debug(`Started server on port: ${configApi.PORT}`);
+    await app.listen(configApi.PORT);
 }
 
 bootstrap();

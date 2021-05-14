@@ -7,7 +7,6 @@ import {
     Injectable,
     UnauthorizedException,
 } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Observable } from 'rxjs';
 import { Repository } from 'typeorm';
@@ -17,6 +16,7 @@ import { DbSession } from "../entities/DbSession";
 // Services
 import { Blocklist } from "./../services/Blocklist";
 import { Token } from "./../services/Token";
+import { ConfigServiceApi } from '../Config';
 
 const invalidTokenError = new HttpException({
     statusCode: HttpStatus.BAD_REQUEST,
@@ -30,7 +30,7 @@ export class AuthGuard implements CanActivate {
         @Inject(Token) private readonly tokenService: Token,
         @InjectRepository(DbSession)
         private dbSessionRepository: Repository<DbSession>,
-        private configService: ConfigService
+        private configApi: ConfigServiceApi
     ) {}
 
     canActivate(
@@ -57,13 +57,13 @@ export class AuthGuard implements CanActivate {
 
         let decodedToken = {};
         try {
-            decodedToken = this.tokenService.verify(token, this.configService.get<string>('TOKEN_ENCRYPTION_KEY'));
+            decodedToken = this.tokenService.verify(token, this.configApi.TOKEN_ENCRYPTION_KEY);
         } catch (error) {
             this.blocklistService.add(token);
             throw invalidTokenError;
         }
     
-        if(this.configService.get<string>('DB_SESSIONS')) {
+        if(this.configApi.DB_SESSIONS) {
             const exists = this.dbSessionRepository.find({
                 token: token
             });

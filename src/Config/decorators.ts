@@ -53,14 +53,17 @@ export function IsPortIfIsMysqlOrPostgres(
 ) {
     return function (object: any, propertyName: string) {
         let message;
+
         const validate = function (value: any, args: ValidationArguments) {
             const databaseType = args.object['DATABASE_TYPE'];
 
             if (
                 ['postgres', 'mysql'].includes(databaseType) &&
-                Number.isInteger(value) &&
-                parseInt(value) >= 0 &&
-                parseInt(value) < 65353
+                !(
+                    Number.isInteger(value) &&
+                    parseInt(value) >= 0 &&
+                    parseInt(value) < 65353
+                )
             ) {
                 message = `${args.property} should be a valid port number [0, 65353]`;
                 return false;

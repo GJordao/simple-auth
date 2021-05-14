@@ -20,11 +20,13 @@ import { User } from "./../entities/User";
 import { Blocklist } from "./../services/Blocklist";
 import { Logger } from "./../services/Logger";
 import { Token } from "../services/Token";
+import { ConfigServiceApi } from '../Config';
 // DTOs
 import { IncomingRefreshToken }  from "./DTOs/IncomingRefreshToken";
 import { OutgoingErrorMessage } from "./DTOs/OutgoingErrorMessage";
 import { OutgoingTokens } from "./DTOs/OutgoingTokens";
-import { ConfigService } from '@nestjs/config';
+
+
 
 const invalidTokenError = new HttpException({
     statusCode: HttpStatus.BAD_REQUEST,
@@ -41,7 +43,7 @@ export class RefreshController {
         private dbSessionRepository: Repository<DbSession>,
         @InjectRepository(User)
         private userRepository: Repository<User>,
-        private configService: ConfigService
+        private configApi: ConfigServiceApi
     ) {
     }
 
@@ -60,11 +62,11 @@ export class RefreshController {
         try {
             const decodedAccessToken = this.tokenService.verify(
                 token,
-                this.configService.get<string>('TOKEN_ENCRYPTION_KEY'),
+                this.configApi.TOKEN_ENCRYPTION_KEY,
                 { ignoreExpiration: true }
             );
 
-            if(this.configService.get<boolean>('DB_SESSIONS')) {
+            if(this.configApi.DB_SESSIONS) {
                 const exists = this.dbSessionRepository.find({
                     token: token
                 });
@@ -77,7 +79,7 @@ export class RefreshController {
             // This will throw an exception if the token is expired
             const decodedRefreshToken = this.tokenService.verify(
                 refreshToken,
-                this.configService.get<string>('TOKEN_ENCRYPTION_KEY')
+                this.configApi.TOKEN_ENCRYPTION_KEY
             );
 
             if(!decodedRefreshToken.isRefresh) {
@@ -101,14 +103,14 @@ export class RefreshController {
 
             const newAccessToken = this.tokenService.sign(
                 { id: decodedAccessToken.id, email: decodedAccessToken.email },
-                this.configService.get<string>('TOKEN_ENCRYPTION_KEY'),
+                this.configApi.TOKEN_ENCRYPTION_KEY,
                 {
-                    expiresIn: this.configService.get<string>('ACCESS_TOKEN_EXPIRE_TIME'),
+                    expiresIn: this.configApi.ACCESS_TOKEN_EXPIRE_TIME,
                 }
             );
 
             this.blocklistService.add(token);
-            if(this.configService.get<boolean>('DB_SESSIONS')) {
+            if(this.configApi.DB_SESSIONS) {
                 await this.dbSessionRepository.delete({
                     token:token
                 });
