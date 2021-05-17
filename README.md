@@ -222,14 +222,20 @@ Below you will find a list of all the available variables, their description and
 
 - **Required**: false
 - **Type**: boolean
-- **Description**: Sets whether logging to a unique temporary directory in the file system is enabled or disabled. The function used to create the temporary folder is [mkdtemp](https://nodejs.org/api/fs.html#fs_fspromises_mkdtemp_prefix_options).
+- **Description**: Sets whether logging to the file system is enabled.
 - **Default Value**: true.
+
+## LOG_FOLDER_PATH
+
+- **Required**: false
+- **Type**: string
+- **Description**: Folder where file logs will be stored. This location will be created if it doesn't exist. If LOG_FOLDER_PATH isn't set then logs will be stored in an unique temporary location, created with [mkdtemp](https://nodejs.org/api/fs.html#fs_fspromises_mkdtemp_prefix_options), with the following format: `<OS specific tmp folder>/simple-auth/logs/<LOG_FOLDER_PREFIX>_<six random characters>/{combined.log, error.log}`
 
 ## LOG_FOLDER_PREFIX
 
 - **Required**: false
 - **Type**: string
-- **Description**: This is a prefix added to the name of the temporary folder created for file logging.
+- **Description**: This is a prefix added to the basename of the temporary folder created for file logging. If LOG_FOLDER_PATH is set then LOG_FOLDER_PREFIX will be ignored.
 - **Default**: 'sa_'
 
 

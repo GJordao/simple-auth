@@ -6,11 +6,12 @@ import {
     IsIn,
     IsInt,
     IsNotEmpty,
-    IsPort,
     IsPositive,
     ValidateIf,
     validateSync,
-    Length
+    Length,
+    NotContains,
+    IsOptional
 } from 'class-validator';
 import {
     IsDefinedAndNotEmptyIfIsMysqlOrPostgres,
@@ -112,9 +113,15 @@ export class EnvironmentVariables {
     @Type(() => Boolean)
     FILE_LOGGING = true;
 
-    @ValidateIf((o) => o.LOG_FILE_ENABLED)
+    @ValidateIf((o) => o.FILE_LOGGING)
     @Length(1, 50)
+    @NotContains('/')
     LOG_FOLDER_PREFIX = 'sa_';
+
+    @ValidateIf((o) => o.FILE_LOGGING)
+    @IsOptional()
+    LOG_FOLDER_PATH: string
+
 }
 
 export function validate(config: Record<string, unknown>) {

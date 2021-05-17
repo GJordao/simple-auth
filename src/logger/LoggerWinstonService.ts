@@ -59,16 +59,16 @@ export class LoggerWinstonService extends Logger {
 
     async asyncSetup(): Promise<LoggerWinstonService> {
         if (this.configApi.FILE_LOGGING) {
+            if (this.configApi.LOG_FOLDER_PATH)
+                this.logFolder = this.configApi.LOG_FOLDER_PATH;
+            else this.logFolder = path.join(os.tmpdir(), 'simple-auth', 'logs');
+
             try {
-                const targetfolder = path.join(
-                    os.tmpdir(),
-                    'simple-auth',
-                    'logs'
-                );
-                await mkdir(targetfolder, { recursive: true });
-                this.logFolder = await mkdtemp(
-                    path.join(targetfolder, this.logPrefix)
-                );
+                await mkdir(this.logFolder, { recursive: true });
+                if (!this.configApi.LOG_FOLDER_PATH)
+                    this.logFolder = await mkdtemp(
+                        path.join(this.logFolder, this.logPrefix)
+                    );
             } catch (err) {
                 console.log(
                     'ERROR: Unable to create logging temp folder {"context": "Logger"}'
@@ -110,9 +110,7 @@ export class LoggerWinstonService extends Logger {
     }
 
     _isLogLevelEnabled(level): boolean {
-        return (
-            LOG_LEVELS[level] <= LOG_LEVELS[this.configApi.LOG_LEVEL]
-        );
+        return LOG_LEVELS[level] <= LOG_LEVELS[this.configApi.LOG_LEVEL];
     }
 
     verbose(message: any, context?: string): void {
