@@ -1,7 +1,7 @@
 import { Injectable, Inject, forwardRef } from '@nestjs/common';
 import IBlocklist from "./IBlocklist";
 import { Token } from "./../Token";
-import { Environment } from "./../Environment";
+import { ConfigServiceApi } from '../../Config';
 
 @Injectable()
 export class MemoryBlocklist implements IBlocklist {
@@ -10,11 +10,10 @@ export class MemoryBlocklist implements IBlocklist {
     constructor(
         @Inject(forwardRef(() => Token))
         private tokenService: Token,
-        @Inject(forwardRef(() => Environment))
-        private envService: Environment,
+        private configApi: ConfigServiceApi
     ) {
         this.blocklist = [];
-        setInterval(() => this.removeOldTokensFromList(), this.envService.ACCESS_TOKEN_EXPIRE_TIME * 1000);
+        setInterval(() => this.removeOldTokensFromList(), this.configApi.ACCESS_TOKEN_EXPIRE_TIME * 1000);
     }
 
     add(value: string): void {
@@ -33,7 +32,7 @@ export class MemoryBlocklist implements IBlocklist {
     private removeOldTokensFromList(): void {
         this.blocklist = this.blocklist.filter(token => {
             try {
-                this.tokenService.verify(token, this.envService.TOKEN_ENCRYPTION_KEY);
+                this.tokenService.verify(token, this.configApi.TOKEN_ENCRYPTION_KEY);
                 return true;
             } catch (error) {
                 return false;

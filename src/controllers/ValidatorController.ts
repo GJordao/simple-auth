@@ -16,19 +16,20 @@ import {AuthGuard} from "../configs/AuthGuard";
 import { DbSession } from "../entities/DbSession";
 // Services
 import { Blocklist } from "./../services/Blocklist";
-import { Environment } from "../services/Environment";
 import { Token } from "../services/Token";
+import { ConfigServiceApi } from '../Config';
 // DTOs
 import { OutgoingErrorMessage } from "./DTOs/OutgoingErrorMessage";
+
 
 @Controller()
 export class ValidatorController {
     constructor(
         private readonly blocklistService: Blocklist,
-        private readonly envService: Environment,
         private readonly tokenService: Token,
         @InjectRepository(DbSession)
-        private dbSessionRepository: Repository<DbSession>
+        private dbSessionRepository: Repository<DbSession>,
+        private configApi: ConfigServiceApi
     ) {
     }
 

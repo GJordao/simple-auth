@@ -21,16 +21,17 @@ import { DbSession } from "../entities/DbSession";
 import { User } from "./../entities/User";
 // Services
 import { Blocklist } from "./../services/Blocklist";
-import { Environment } from "../services/Environment";
 import { Logger } from "./../services/Logger";
 import { Mail } from "./../services/Mail";
 import { Password } from "./../services/Password";
 import { Token } from "../services/Token";
+import { ConfigServiceApi } from '../Config';
 // DTOs
 import { IncomingEmail }  from "./DTOs/IncomingEmail";
 import { IncomingPasswordChange }  from "./DTOs/IncomingPasswordChange";
 import { IncomingPasswordReset }  from "./DTOs/IncomingPasswordReset";
 import { OutgoingErrorMessage } from "./DTOs/OutgoingErrorMessage";
+
 
 const invalidTokenError = new HttpException({
     statusCode: HttpStatus.BAD_REQUEST,
@@ -46,7 +47,6 @@ const invalidCredentialsError = new HttpException({
 export class PasswordController {
     constructor(
         private readonly blocklistService: Blocklist,
-        private readonly envService: Environment,
         private readonly logger: Logger,
         private readonly mailService: Mail,
         private readonly passwordService: Password,
@@ -55,6 +55,7 @@ export class PasswordController {
         private dbSessionRepository: Repository<DbSession>,
         @InjectRepository(User)
         private usersRepository: Repository<User>,
+        private configApi: ConfigServiceApi
     ) {
     }
 
@@ -75,7 +76,7 @@ export class PasswordController {
             throw invalidTokenError;
         }
 
-        const PASSWORD_PEPPER = this.envService.PASSWORD_PEPPER;
+        const PASSWORD_PEPPER = this.configApi.PASSWORD_PEPPER;
         const doesPasswordMatch = await this.passwordService.compare(
             PASSWORD_PEPPER + body.password,
             user.password
@@ -120,7 +121,7 @@ export class PasswordController {
         user.passwordResetId = uuidv4();
         await this.usersRepository.save(user);
 
-        const redirectUrl = `${this.envService.PASSWORD_RESET_URL}?passwordResetId=${user.passwordResetId}`;
+        const redirectUrl = `${this.configApi.PASSWORD_RESET_URL}?passwordResetId=${user.passwordResetId}`;
         this.mailService.send(
             user.email,
             "Password reset",
@@ -148,7 +149,7 @@ export class PasswordController {
             }, HttpStatus.BAD_REQUEST);
         }
 
-        const PASSWORD_PEPPER = this.envService.PASSWORD_PEPPER;
+        const PASSWORD_PEPPER = this.configApi.PASSWORD_PEPPER;
         const newPassword = PASSWORD_PEPPER + body.password;
         const passwordHash = await this.passwordService.hash(newPassword);
         user.password = passwordHash;

@@ -20,11 +20,13 @@ import {AuthGuard} from "../configs/AuthGuard";
 import { DbSession } from "../entities/DbSession";
 // Services
 import { Blocklist } from "./../services/Blocklist";
-import { Environment } from "../services/Environment";
 import { Token } from "../services/Token";
+import { ConfigServiceApi } from '../Config';
 // DTOs
 import { OutgoingErrorMessage } from "./DTOs/OutgoingErrorMessage";
 import { IncomingRefreshToken }  from "./DTOs/IncomingRefreshToken";
+
+
 
 const invalidTokenError = new HttpException({
     statusCode: HttpStatus.BAD_REQUEST,
@@ -35,10 +37,10 @@ const invalidTokenError = new HttpException({
 export class LogoutController {
     constructor(
         private readonly blocklistService: Blocklist,
-        private readonly envService: Environment,
         private readonly tokenService: Token,
         @InjectRepository(DbSession)
-        private dbSessionRepository: Repository<DbSession>
+        private dbSessionRepository: Repository<DbSession>,
+        private configApi: ConfigServiceApi
     ) {
     }
 
@@ -59,12 +61,12 @@ export class LogoutController {
         try {
             const decodedAccessToken = this.tokenService.verify(
                 token,
-                this.envService.TOKEN_ENCRYPTION_KEY
+                this.configApi.TOKEN_ENCRYPTION_KEY
             );
             
             const decodedRefreshToken = this.tokenService.verify(
                 refreshToken,
-                this.envService.TOKEN_ENCRYPTION_KEY
+                this.configApi.TOKEN_ENCRYPTION_KEY
             );
 
             if(!decodedRefreshToken.isRefresh) {
@@ -78,7 +80,7 @@ export class LogoutController {
             this.blocklistService.add(token);
             this.blocklistService.add(refreshToken);
 
-            if(this.envService.DB_SESSIONS) {
+            if(this.configApi.DB_SESSIONS) {
                 await this.dbSessionRepository.delete({
                     token:token
                 });
@@ -86,7 +88,7 @@ export class LogoutController {
         } catch (error) {
             this.blocklistService.add(token);
             this.blocklistService.add(refreshToken);
-            if(this.envService.DB_SESSIONS) {
+            if(this.configApi.DB_SESSIONS) {
                 await this.dbSessionRepository.delete({
                     token:token
                 });
