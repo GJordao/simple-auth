@@ -24,6 +24,8 @@ export class Environment {
     public ACCOUNT_CONFIRMATION_REDIRECT_URL: string;
     public DB_SESSIONS: boolean;
     public PASSWORD_RESET_URL: string;
+    public MAX_LOGIN_TRIES: number;
+    public ACCOUNT_BLOCK_TIME: number;
 
     constructor() {
         this.DATABASE_TYPE = this.required(process.env.DATABASE_TYPE);
@@ -51,6 +53,8 @@ export class Environment {
         if(this.SMTP_HOST) {
             this.PASSWORD_RESET_URL = this.required(process.env.PASSWORD_RESET_URL);
         }
+        this.MAX_LOGIN_TRIES = this.defaultIfNotEmpty(this.number(process.env.MAX_LOGIN_TRIES), 3);
+        this.ACCOUNT_BLOCK_TIME = this.defaultIfNotEmpty(this.number(process.env.ACCOUNT_BLOCK_TIME), 300);
     }
 
     private defaultIfNotEmpty(field, defaultValue) {
