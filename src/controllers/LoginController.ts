@@ -4,13 +4,15 @@ import {
     Controller, 
     HttpException, 
     HttpStatus,
-    Post, 
+    Post,
+    Req,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { 
     ApiResponse
 } from '@nestjs/swagger';
+import { Request } from 'express';
 // Services
 import { Environment } from "../services/Environment";
 import { Logger } from "../services/Logger";
@@ -18,6 +20,7 @@ import { Password } from '../services/Password';
 import { Token } from "../services/Token";
 // Entities
 import { DbSession } from "../entities/DbSession";
+import { LoginLogs } from "../entities/LoginLogs";
 import { User } from "../entities/User";
 // DTOs
 import { IncomingCrendetials } from "./DTOs/IncomingCredentials";
@@ -44,7 +47,9 @@ export class LoginController {
         @InjectRepository(User)
         private usersRepository: Repository<User>,
         @InjectRepository(DbSession)
-        private dbSessionRepository: Repository<DbSession>
+        private dbSessionRepository: Repository<DbSession>,
+        @InjectRepository(LoginLogs)
+        private loginLogsRepository: Repository<LoginLogs>
     ) {
     }
 
@@ -54,12 +59,41 @@ export class LoginController {
     @ApiResponse({ status: 500, description: 'Server error', type: OutgoingErrorMessage})
     async login(
         @Body()
-            credentials: IncomingCrendetials
+            credentials: IncomingCrendetials,
+            @Req() request: Request,
     ): Promise<OutgoingTokens> {
         const PASSWORD_PEPPER = this.envService.PASSWORD_PEPPER;
-        const user = await this.usersRepository.findOne({ email: credentials.email });
+        const user = await this.usersRepository.findOne(
+            { email: credentials.email }
+        );
+
         if (!user) {
             throw invalidCredentialsError;
+        }
+
+        const attempts = await this.loginLogsRepository.find({
+            where: {
+                user: user,
+                ip: request.clientIp,
+                successful: false
+            },
+            order: {
+                date: "DESC"
+            },
+            take: this.envService.MAX_LOGIN_TRIES
+        })
+
+        if(attempts.length >= this.envService.MAX_LOGIN_TRIES) {
+            const latestAttempt = attempts[0];
+            const oldestAttempt = attempts[attempts.length-1];
+
+            const differenceInSeconds = (latestAttempt.date.getTime() - oldestAttempt.date.getTime()) / 1000
+            console.log(differenceInSeconds, this.envService.ACCOUNT_BLOCK_TIME);
+            if(differenceInSeconds <= this.envService.ACCOUNT_BLOCK_TIME) {
+                console.log('blocked', attempts);
+            } else {
+                console.log('not blocked', attempts);
+            }
         }
 
         const doesPasswordMatch = await this.passwordService.compare(
@@ -68,6 +102,12 @@ export class LoginController {
         )
 
         if (!doesPasswordMatch) {
+            const failedLoginAttempt = new LoginLogs();
+            failedLoginAttempt.ip = request.clientIp;
+            failedLoginAttempt.successful = false;
+            failedLoginAttempt.user = user;
+            this.loginLogsRepository.save(failedLoginAttempt);
+
             throw invalidCredentialsError;
         }
 
@@ -101,6 +141,12 @@ export class LoginController {
             dbSession.user = user;
             await this.dbSessionRepository.save(dbSession);
         }
+
+        const successfulLoginAttempt = new LoginLogs();
+        successfulLoginAttempt.ip = request.clientIp;
+        successfulLoginAttempt.successful = true;
+        successfulLoginAttempt.user = user;
+        this.loginLogsRepository.save(successfulLoginAttempt);
 
         return response;
     }

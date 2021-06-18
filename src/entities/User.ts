@@ -8,6 +8,7 @@ import {
 } from "typeorm";
 // Entities
 import { DbSession } from "./DbSession";
+import { LoginLogs } from "./LoginLogs";
 
 @Entity()
 export class User {
@@ -41,4 +42,7 @@ export class User {
 
     @OneToMany(() => DbSession, dbSession => dbSession.user)
     dbSessions: DbSession[];
+
+    @OneToMany(() => LoginLogs, loginLogs => loginLogs.user)
+    loginLogs: LoginLogs[];
 }

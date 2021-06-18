@@ -3,9 +3,11 @@ import { AppModule } from "./AppModule";
 import { NestFactory } from "@nestjs/core";
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { ValidationPipe } from "./configs/ValidationPipe";
+import * as requestIp from 'request-ip';
 
 async function bootstrap() {
     const app = await NestFactory.create(AppModule);
+    app.use(requestIp.mw());
     app.useGlobalPipes(new ValidationPipe());
     const environmentInstance = app.get("Environment");
     const loggerInstance = app.get("ConsoleLogger");
