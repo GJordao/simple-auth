@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { ConfigModule } from '@nestjs/config';
 // Controllers
 import { AccountController } from './controllers/AccountController';
 import { LoginController } from './controllers/LoginController';
@@ -21,6 +22,7 @@ import { User } from "./entities/User";
 
 @Module({
     imports: [
+        ConfigModule.forRoot(),
         /**
          * We can use process.env here
          * The module Environment will throw an error 
