@@ -60,5 +60,8 @@ import { User } from "./entities/User";
         Password,
         Token,
     ],
+    exports: [
+        AuthValidator,
+    ]
 })
 export class AppModule {}
