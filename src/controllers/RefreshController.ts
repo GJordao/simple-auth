@@ -46,7 +46,7 @@ export class RefreshController {
     }
 
     @Post("/auth/refresh")
-    @ApiBearerAuth()
+    @ApiBearerAuth('access-token')
     @ApiResponse({ status: 200, description: 'Successful', type: OutgoingTokens})
     @ApiResponse({ status: 400, description: 'Invalid credentials sent through', type: OutgoingErrorMessage})
     @ApiResponse({ status: 500, description: 'Server error', type: OutgoingErrorMessage})

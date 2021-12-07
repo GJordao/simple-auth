@@ -34,7 +34,7 @@ export class ValidatorController {
 
     @Get("/auth/isValid")
     @UseGuards(AuthGuard)
-    @ApiBearerAuth()
+    @ApiBearerAuth('access-token')
     @ApiResponse({ status: 200, description: 'Successful'})
     @ApiResponse({ status: 400, description: 'Invalid credentials sent through', type: OutgoingErrorMessage})
     @ApiResponse({ status: 500, description: 'Server error', type: OutgoingErrorMessage})

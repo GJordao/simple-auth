@@ -47,7 +47,7 @@ export class AccountController {
 
     @Delete("/auth/account")
     @UseGuards(AuthGuard)
-    @ApiBearerAuth()
+    @ApiBearerAuth('access-token')
     @ApiResponse({ status: 200, description: 'The account was deleted'})
     @ApiResponse({ status: 400, description: 'Invalid tokens sent through', type: OutgoingErrorMessage})
     @ApiResponse({ status: 500, description: 'Server error', type: OutgoingErrorMessage})
