@@ -5,10 +5,10 @@ import {
     Injectable,
 } from '@nestjs/common';
 import { Observable } from 'rxjs';
-import { Request } from "express";
+import { Request } from 'express';
 
 // Services
-import { AuthValidator } from "./../services/AuthValidator";
+import { AuthValidator } from './../services/AuthValidator';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
