@@ -11,7 +11,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { 
     ApiBearerAuth,
-    ApiResponse
+    ApiResponse,
+    ApiTags,
 } from '@nestjs/swagger';
 // Configs
 import {AuthGuard} from "../configs/AuthGuard";
@@ -31,6 +32,7 @@ const invalidTokenError = new HttpException({
     message: "Invalid tokens sent through",
 }, HttpStatus.BAD_REQUEST);
 
+@ApiTags('simple-auth')
 @Controller()
 export class AccountController {
     constructor(
@@ -47,7 +49,7 @@ export class AccountController {
 
     @Delete("/auth/account")
     @UseGuards(AuthGuard)
-    @ApiBearerAuth()
+    @ApiBearerAuth('access-token')
     @ApiResponse({ status: 200, description: 'The account was deleted'})
     @ApiResponse({ status: 400, description: 'Invalid tokens sent through', type: OutgoingErrorMessage})
     @ApiResponse({ status: 500, description: 'Server error', type: OutgoingErrorMessage})
