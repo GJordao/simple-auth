@@ -10,6 +10,7 @@ import { PasswordController } from "./controllers/PasswordController";
 import { RegisterController } from './controllers/RegisterController';
 import { ValidatorController } from "./controllers/ValidatorController";
 // Services
+import { AuthValidator } from './services/AuthValidator';
 import { Blocklist } from "./services/Blocklist";
 import { Environment } from "./services/Environment";
 import { Logger } from "./services/Logger";
@@ -51,6 +52,7 @@ import { User } from "./entities/User";
         ValidatorController
     ],
     providers: [
+        AuthValidator,
         Blocklist,
         Environment,
         Logger,
