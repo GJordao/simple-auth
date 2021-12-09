@@ -12,7 +12,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { 
     ApiBearerAuth,
-    ApiResponse
+    ApiResponse,
+    ApiTags,
 } from '@nestjs/swagger';
 // Configs
 import {AuthGuard} from "../configs/AuthGuard";
@@ -31,6 +32,7 @@ const invalidTokenError = new HttpException({
     message: "Invalid tokens sent through",
 }, HttpStatus.BAD_REQUEST);
 
+@ApiTags('simple-auth')
 @Controller()
 export class LogoutController {
     constructor(
@@ -44,7 +46,7 @@ export class LogoutController {
 
     @Post("/auth/logout")
     @UseGuards(AuthGuard)
-    @ApiBearerAuth()
+    @ApiBearerAuth('access-token')
     @ApiResponse({ status: 200, description: 'Successful'})
     @ApiResponse({ status: 400, description: 'Invalid credentials sent through', type: OutgoingErrorMessage})
     @ApiResponse({ status: 500, description: 'Server error', type: OutgoingErrorMessage})

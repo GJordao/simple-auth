@@ -9,9 +9,9 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { ApiBearerAuth, ApiResponse } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
 // Configs
-import {AuthGuard} from "../configs/AuthGuard";
+import { AuthGuard } from "../configs/AuthGuard";
 // Entities
 import { DbSession } from "../entities/DbSession";
 // Services
@@ -21,6 +21,7 @@ import { Token } from "../services/Token";
 // DTOs
 import { OutgoingErrorMessage } from "./DTOs/OutgoingErrorMessage";
 
+@ApiTags('simple-auth')
 @Controller()
 export class ValidatorController {
     constructor(
@@ -34,7 +35,7 @@ export class ValidatorController {
 
     @Get("/auth/isValid")
     @UseGuards(AuthGuard)
-    @ApiBearerAuth()
+    @ApiBearerAuth('access-token')
     @ApiResponse({ status: 200, description: 'Successful'})
     @ApiResponse({ status: 400, description: 'Invalid credentials sent through', type: OutgoingErrorMessage})
     @ApiResponse({ status: 500, description: 'Server error', type: OutgoingErrorMessage})

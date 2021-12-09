@@ -13,7 +13,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { v4 as uuidv4 } from "uuid";
-import { ApiBearerAuth, ApiResponse } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
 // Configs
 import {AuthGuard} from "../configs/AuthGuard";
 // Entities
@@ -42,6 +42,8 @@ const invalidCredentialsError = new HttpException({
     message: "Wrong credentials sent through",
 }, HttpStatus.BAD_REQUEST);
 
+
+@ApiTags('simple-auth')
 @Controller()
 export class PasswordController {
     constructor(
@@ -60,7 +62,7 @@ export class PasswordController {
 
     @Put("/auth/password")
     @UseGuards(AuthGuard)
-    @ApiBearerAuth()
+    @ApiBearerAuth('access-token')
     @ApiResponse({ status: 200, description: 'Successful'})
     @ApiResponse({ status: 400, description: 'Invalid credentials sent through', type: OutgoingErrorMessage})
     @ApiResponse({ status: 500, description: 'Server error', type: OutgoingErrorMessage})

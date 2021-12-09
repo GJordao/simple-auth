@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { ConfigModule } from '@nestjs/config';
 // Controllers
 import { AccountController } from './controllers/AccountController';
 import { LoginController } from './controllers/LoginController';
@@ -9,6 +10,7 @@ import { PasswordController } from "./controllers/PasswordController";
 import { RegisterController } from './controllers/RegisterController';
 import { ValidatorController } from "./controllers/ValidatorController";
 // Services
+import { AuthValidator } from './services/AuthValidator';
 import { Blocklist } from "./services/Blocklist";
 import { Environment } from "./services/Environment";
 import { Logger } from "./services/Logger";
@@ -21,6 +23,7 @@ import { User } from "./entities/User";
 
 @Module({
     imports: [
+        ConfigModule.forRoot(),
         /**
          * We can use process.env here
          * The module Environment will throw an error 
@@ -49,6 +52,7 @@ import { User } from "./entities/User";
         ValidatorController
     ],
     providers: [
+        AuthValidator,
         Blocklist,
         Environment,
         Logger,
@@ -56,5 +60,8 @@ import { User } from "./entities/User";
         Password,
         Token,
     ],
+    exports: [
+        AuthValidator,
+    ]
 })
 export class AppModule {}
