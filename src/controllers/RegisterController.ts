@@ -15,7 +15,7 @@ import { Request } from "express";
 import { v4 as uuidv4 } from "uuid";
 import { Repository } from 'typeorm';
 import { plainToClass } from 'class-transformer';
-import { ApiResponse } from '@nestjs/swagger';
+import {ApiResponse, ApiTags} from '@nestjs/swagger';
 // Services
 import { Environment } from "../services/Environment";
 import { Password } from '../services/Password';
@@ -27,6 +27,7 @@ import { IncomingCrendetials } from "./DTOs/IncomingCredentials";
 import { OutgoingErrorMessage } from "./DTOs/OutgoingErrorMessage";
 import { OutgoingUser } from "./DTOs/OutgoingUser";
 
+@ApiTags("simple-auth")
 @Controller()
 export class RegisterController {
     constructor(

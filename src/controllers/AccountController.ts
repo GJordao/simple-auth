@@ -9,9 +9,10 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { 
+import {
     ApiBearerAuth,
-    ApiResponse
+    ApiResponse,
+    ApiTags
 } from '@nestjs/swagger';
 // Configs
 import {AuthGuard} from "../configs/AuthGuard";
@@ -31,6 +32,7 @@ const invalidTokenError = new HttpException({
     message: "Invalid tokens sent through",
 }, HttpStatus.BAD_REQUEST);
 
+@ApiTags("simple-auth")
 @Controller()
 export class AccountController {
     constructor(

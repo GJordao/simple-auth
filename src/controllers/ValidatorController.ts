@@ -9,7 +9,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { ApiBearerAuth, ApiResponse } from '@nestjs/swagger';
+import {ApiBearerAuth, ApiResponse, ApiTags} from '@nestjs/swagger';
 // Configs
 import {AuthGuard} from "../configs/AuthGuard";
 // Entities
@@ -21,6 +21,7 @@ import { Token } from "../services/Token";
 // DTOs
 import { OutgoingErrorMessage } from "./DTOs/OutgoingErrorMessage";
 
+@ApiTags("simple-auth")
 @Controller()
 export class ValidatorController {
     constructor(

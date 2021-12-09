@@ -9,7 +9,8 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { 
-    ApiResponse
+    ApiResponse,
+    ApiTags
 } from '@nestjs/swagger';
 // Services
 import { Environment } from "../services/Environment";
@@ -34,6 +35,7 @@ const inactiveAccountError = new HttpException({
     message: "Account is not active",
 }, HttpStatus.BAD_REQUEST);
 
+@ApiTags("simple-auth")
 @Controller()
 export class LoginController {
     constructor(
