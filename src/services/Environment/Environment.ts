@@ -14,9 +14,13 @@ export class Environment {
     public ACCESS_TOKEN_EXPIRE_TIME: number;
     public REFRESH_TOKEN_EXPIRE_TIME: number;
     public MODE: string;
+    public SMTP_DEBUG: boolean;
     public SMTP_HOST: string;
     public SMTP_PORT: number;
     public SMTP_SECURE: boolean;
+    public SMTP_REQUIRE_TLS: boolean;
+    public SMTP_IGNORE_TLS: boolean;
+    public SMTP_TLS_CIPHERS: string;
     public SMTP_USER: string;
     public SMTP_PASSWORD: string;
     public SMTP_MAIL_FROM: string;
@@ -38,9 +42,13 @@ export class Environment {
         this.ACCESS_TOKEN_EXPIRE_TIME = this.defaultIfNotEmpty(this.number(process.env.ACCESS_TOKEN_EXPIRE_TIME), 600);
         this.REFRESH_TOKEN_EXPIRE_TIME = this.defaultIfNotEmpty(this.number(process.env.REFRESH_TOKEN_EXPIRE_TIME), 2629743);
         this.MODE = this.defaultIfNotEmpty(process.env.MODE, "prod");
+        this.SMTP_DEBUG = this.boolean(process.env.SMTP_DEBUG);
         this.SMTP_HOST = this.defaultIfNotEmpty(process.env.SMTP_HOST, "");
         this.SMTP_PORT = this.defaultIfNotEmpty(this.number(process.env.SMTP_PORT), undefined);
         this.SMTP_SECURE = this.boolean(process.env.SMTP_SECURE);
+        this.SMTP_REQUIRE_TLS = this.boolean(process.env.SMTP_REQUIRE_TLS);
+        this.SMTP_IGNORE_TLS = this.boolean(process.env.SMTP_IGNORE_TLS);
+        this.SMTP_TLS_CIPHERS = this.defaultIfNotEmpty(process.env.SMTP_TLS_CIPHERS, "SSLv3");
         this.SMTP_USER = this.defaultIfNotEmpty(process.env.SMTP_USER, "");
         this.SMTP_PASSWORD = this.defaultIfNotEmpty(process.env.SMTP_PASSWORD, "");
         this.SMTP_MAIL_FROM = this.defaultIfNotEmpty(process.env.SMTP_MAIL_FROM, "");

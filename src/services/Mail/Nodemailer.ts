@@ -22,10 +22,17 @@ export class Nodemailer implements IMail {
             host: this.envService.SMTP_HOST,
             port: this.envService.SMTP_PORT,
             secure: this.envService.SMTP_SECURE,
+            requireTLS: this.envService.SMTP_REQUIRE_TLS,
+            ignoreTLS: this.envService.SMTP_IGNORE_TLS,
+            tls: {
+                ciphers:this.envService.SMTP_TLS_CIPHERS,
+            },
             auth: {
                 user: this.envService.SMTP_USER,
                 pass: this.envService.SMTP_PASSWORD
             },
+            debug: this.envService.SMTP_DEBUG,
+            logger: this.envService.SMTP_DEBUG,
         });
     }
 
@@ -43,7 +50,7 @@ export class Nodemailer implements IMail {
             await this.transporter.verify();
             return true;
         } catch (error) {
-            this.logger.log(`Email service is offiline`);
+            this.logger.log('Email service is offline');
             return false;
         }
     }

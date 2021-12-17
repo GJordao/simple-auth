@@ -72,7 +72,7 @@ Simple-Auth aims to be highly configurable and this configuration comes in the f
 Below you will find a list of all the available variables, their description and types.
 
 ## DATABASE_TYPE *
-      
+
 - **Required**: true
 - **Type**: string
 - **Values**: postgres, mysql
@@ -85,108 +85,136 @@ Below you will find a list of all the available variables, their description and
 - **Description**: The host name of your database, this could be the name of the service inside a docker network or a url
 
 ## DATABASE_NAME *
-      
+
 - **Required**: true
 - **Type**: string
 - **Description**: The name of the database to connect to. It is up to you to unsure that the database is created before initialising the service
 
 ## DATABASE_PORT *
-      
+
 - **Required**: true
 - **Type**: number
 - **Description**: The port in which the database service is listening
 
 ## DATABASE_USERNAME *
-      
+
 - **Required**: true
 - **Type**: string
 - **Description**: The user of the database to use in the connection
 
 ## DATABASE_PASSWORD *
-      
+
 - **Required**: true
 - **Type**: string
 - **Description**: The password of the user to use in the connection
-      
+
 ## TOKEN_ENCRYPTION_KEY *
-      
+
 - **Required**: true
 - **Type**: string
 - **Description**: The secret key to encrypt the tokens with. We are currently using [node-jsonwebtoken](https://github.com/auth0/node-jsonwebtoken#usage) you can find more information there.
 
 ## PASSWORD_RESET_URL *
+
 - **Required**: true
 - **Type**: string
 - **Description**: A URL to your app's page for a password reset. This page will be used when a user requests requests a password reset (usually forgotten password). When a user forgets their password, an email will be sent to the user's email with the link to this page and an additional query property which you will then need to pass to the API for the reset. Ex: if you pass `http://mywebsite.co/password-reset` the request will reach your page like so: `http://mywebsite.co/password-reset?passwordResetId=<some-uuid>`, you will then need to pass that UUID to the correct endpoint to trigger the password reset for the user. The idea here is that you will have control of the workflow and the design of the page for password reset without gimmiks from our service.
 
 ## PASSWORD_PEPPER
-      
+
 - **Required**: false
 - **Type**: string
 - **Description**: A string to be used as [pepper](https://en.wikipedia.org/wiki/Pepper_(cryptography)) in protecting user passwords. **If you set this you can not change it a later time as it would make it impossible to verify previously hashed passwords**
 - **Default Value**: ""
       
 ## PORT
-      
+
 - **Required**: false
 - **Type**: number
 - **Description**: The port in which the HTTP server will run
 - **Default Value**: 5000
 
 ## ACCESS_TOKEN_EXPIRE_TIME
-      
+
 - **Required**: false
 - **Type**: number
 - **Description**: The number of seconds a token should last. This should be a short time, 10 to 60 minutes usually
 - **Default Value**: 600 (10 minutes)
 
 ## REFRESH_TOKEN_EXPIRE_TIME
-      
+
 - **Required**: false
 - **Type**: number
-- **Description**: The number of seconds the refresh token should last. This token is long lived, usually between serveral days or months. When this token expires your user will have to login again
+- **Description**: The number of seconds the refresh token should last. This token is long lived, usually between several days or months. When this token expires your user will have to login again
 - **Default Value**: 2629743 (~30 days)
 
 ## MODE
-      
+
 - **Required**: false
 - **Type**: string
 - **Description**: The mode the service should run in. Possible values include ["dev", "prod"]. dev mode will show more debug information
 - **Default Value**: prod
 
+## SMTP_DEBUG
+
+- **Required**: false
+- **Type**: boolean
+- **Description**: Enables SMTP communication logs
+
 ## SMTP_HOST
-      
+
 - **Required**: false
 - **Type**: string
 - **Description**: The server host of the SMTP email client to use. If none is provided the auth service will not send confirmation emails
 
 ## SMTP_PORT
-      
+
 - **Required**: false (true if using [SMTP_HOST](#SMTP_HOST))
 - **Type**: number
 - **Description**: The server port where the SMTP server is running
 
 ## SMTP_SECURE
-      
+
 - **Required**: false
 - **Type**: boolean
-- **Description**: Wether to use TLS in the connection to the server
+- **Description**: Wether to use TLS in the connection to the server. If false (the default) then TLS is used if server supports the STARTTLS: [smtp-tls-options](https://nodemailer.com/smtp/#tls-options)
 - **Default Value**: false
 
+## SMTP_REQUIRE_TLS
+
+- **Required**: false
+- **Type**: boolean
+- **Description**: When set to true and secure is false it tries to use STARTTLS even if the server does not advertise support for it. If the connection can not be encrypted then message is not sent: [smtp-tls-options](https://nodemailer.com/smtp/#tls-options)
+- **Default Value**: false
+
+## SMTP_IGNORE_TLS
+
+- **Required**: false
+- **Type**: boolean
+- **Description**: When set to true and secure is false then TLS is not used even if the server supports STARTTLS extension: [smtp-tls-options](https://nodemailer.com/smtp/#tls-options)
+- **Default Value**: false
+
+## SMTP_TLS_CIPHERS
+
+- **Required**: false
+- **Type**: string
+- **Description**: TLS Cipher
+- **Default Value**: SSLv3
+
 ## SMTP_USER
-      
+
 - **Required**: false (true if using [SMTP_HOST](#SMTP_HOST))
 - **Type**: string
 - **Description**: The user to connect to the SMTP server
 
 ## SMTP_PASSWORD
-      
+
 - **Required**: false (true if using [SMTP_HOST](#SMTP_HOST))
 - **Type**: string
 - **Description**: The password of the user to connect to the SMTP server
 
 ## SMTP_MAIL_FROM
-      
+
 - **Required**: false (true if using [SMTP_HOST](#SMTP_HOST))
 - **Type**: string
 - **Description**: The email address that will show up in "From" when sending emails
