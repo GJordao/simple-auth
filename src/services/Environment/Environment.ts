@@ -78,10 +78,9 @@ export class Environment {
         return field;
     }
 
-    private boolean(field): boolean {
-        const parsedField = Boolean(field);
-        if(typeof parsedField === "boolean") {
-            return parsedField;
+    private boolean(field = ""): boolean {
+        if(field.toLocaleLowerCase() === "true") {
+            return true;
         }
 
         return false;
